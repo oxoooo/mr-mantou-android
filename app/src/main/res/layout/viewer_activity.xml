@@ -25,12 +25,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <fragment
-            android:id="@+id/viewer"
-            android:name="ooo.oxo.mr.ViewerFragment"
+        <ooo.oxo.mr.widget.PullBackLayout
+            android:id="@+id/puller"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:layout="@layout/viewer_fragment" />
+            android:layout_height="match_parent">
+
+            <fragment
+                android:id="@+id/viewer"
+                android:name="ooo.oxo.mr.ViewerFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout="@layout/viewer_fragment" />
+
+        </ooo.oxo.mr.widget.PullBackLayout>
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"

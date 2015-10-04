@@ -74,4 +74,8 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
         transitionTrigger.cancel();
     }
 
+    boolean canScroll() {
+        return binding.image.canScroll();
+    }
+
 }

@@ -22,6 +22,7 @@ import android.annotation.TargetApi;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.transition.Transition;
 import android.view.View;
 
@@ -29,8 +30,9 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import ooo.oxo.mr.databinding.ViewerActivityBinding;
 import ooo.oxo.mr.util.SimpleTransitionListener;
+import ooo.oxo.mr.widget.PullBackLayout;
 
-public class ViewerActivity extends RxAppCompatActivity {
+public class ViewerActivity extends RxAppCompatActivity implements PullBackLayout.Callback {
 
     private static final int SYSTEM_UI_BASE_VISIBILITY = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -50,6 +52,8 @@ public class ViewerActivity extends RxAppCompatActivity {
 
         binding.toolbar.setNavigationOnClickListener(v -> supportFinishAfterTransition());
 
+        binding.puller.setCallback(this);
+
         supportPostponeEnterTransition();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -68,12 +72,12 @@ public class ViewerActivity extends RxAppCompatActivity {
 
     void fadeIn() {
         binding.toolbar.animate().alpha(1).start();
-        binding.getRoot().setSystemUiVisibility(SYSTEM_UI_BASE_VISIBILITY);
+        showSystemUi();
     }
 
     void fadeOut() {
         binding.toolbar.animate().alpha(0).start();
-        binding.getRoot().setSystemUiVisibility(SYSTEM_UI_BASE_VISIBILITY | SYSTEM_UI_IMMERSIVE);
+        hideSystemUi();
     }
 
     void toggleFade() {
@@ -82,6 +86,51 @@ public class ViewerActivity extends RxAppCompatActivity {
         } else {
             fadeOut();
         }
+    }
+
+    private void showSystemUi() {
+        binding.getRoot().setSystemUiVisibility(SYSTEM_UI_BASE_VISIBILITY);
+    }
+
+    private void hideSystemUi() {
+        binding.getRoot().setSystemUiVisibility(SYSTEM_UI_BASE_VISIBILITY | SYSTEM_UI_IMMERSIVE);
+    }
+
+    @Override
+    public void onPullStart() {
+        fadeOut();
+        showSystemUi();
+    }
+
+    @Override
+    public void onPull(float progress) {
+        progress = Math.min(1f, progress * 3f);
+
+        getWindow().getDecorView().getBackground().setAlpha((int) (0xff * (1f - progress)));
+        //if (binding.toolbar.getAlpha() != 0) {
+        //    binding.toolbar.setAlpha(1.01f - progress);
+        //}
+    }
+
+    @Override
+    public void onPullCancel() {
+        fadeIn();
+    }
+
+    @Override
+    public void onPullComplete() {
+        supportFinishAfterTransition();
+    }
+
+    @Override
+    public boolean canPullDown() {
+        ViewerFragment current = getCurrent();
+        return current != null && !current.canScroll();
+    }
+
+    @Nullable
+    private ViewerFragment getCurrent() {
+        return (ViewerFragment) getSupportFragmentManager().findFragmentById(R.id.viewer);
     }
 
 }
