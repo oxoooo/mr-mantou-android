@@ -31,7 +31,7 @@ import android.view.ViewGroup;
 import ooo.oxo.mr.databinding.AboutActivityBinding;
 import ooo.oxo.mr.databinding.AboutHeaderBinding;
 import ooo.oxo.mr.databinding.AboutLibraryItemBinding;
-import ooo.oxo.mr.widget.RecyclerViewBindingHolder;
+import ooo.oxo.mr.widget.BindingRecyclerView;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -66,19 +66,19 @@ public class AboutActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    class LibrariesAdapter extends RecyclerView.Adapter<RecyclerViewBindingHolder> {
+    class LibrariesAdapter extends RecyclerView.Adapter<BindingRecyclerView.ViewHolder> {
 
         private final LayoutInflater inflater = getLayoutInflater();
 
         @Override
-        public RecyclerViewBindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public BindingRecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             return viewType == 0
                     ? new HeaderViewHolder(AboutHeaderBinding.inflate(inflater, parent, false))
                     : new ItemViewHolder(AboutLibraryItemBinding.inflate(inflater, parent, false));
         }
 
         @Override
-        public void onBindViewHolder(RecyclerViewBindingHolder holder, int position) {
+        public void onBindViewHolder(BindingRecyclerView.ViewHolder holder, int position) {
             if (holder.getItemViewType() == 0) {
                 ((HeaderViewHolder) holder).binding.setName(position == 0
                         ? R.string.fork_me_on_github
@@ -111,7 +111,7 @@ public class AboutActivity extends AppCompatActivity {
             }
         }
 
-        class HeaderViewHolder extends RecyclerViewBindingHolder<AboutHeaderBinding> {
+        class HeaderViewHolder extends BindingRecyclerView.ViewHolder<AboutHeaderBinding> {
 
             public HeaderViewHolder(AboutHeaderBinding binding) {
                 super(binding);
@@ -119,7 +119,7 @@ public class AboutActivity extends AppCompatActivity {
 
         }
 
-        class ItemViewHolder extends RecyclerViewBindingHolder<AboutLibraryItemBinding> {
+        class ItemViewHolder extends BindingRecyclerView.ViewHolder<AboutLibraryItemBinding> {
 
             public ItemViewHolder(AboutLibraryItemBinding binding) {
                 super(binding);

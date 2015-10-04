@@ -27,12 +27,10 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import ooo.oxo.mr.model.Image;
-
 /**
  * Starts the postponed transition of an Activity once image ready or time-outed
  */
-public class PostponedTransitionTrigger implements RequestListener<Image, GlideDrawable> {
+public class PostponedTransitionTrigger implements RequestListener<String, GlideDrawable> {
 
     private static final String TAG = "PostponedStarter";
 
@@ -53,7 +51,7 @@ public class PostponedTransitionTrigger implements RequestListener<Image, GlideD
     }
 
     @Override
-    public boolean onException(Exception e, Image model, Target<GlideDrawable> target,
+    public boolean onException(Exception e, String model, Target<GlideDrawable> target,
                                boolean isFirstResource) {
         Log.d(TAG, "start transition on exception");
         supportStartPostponedEnterTransition();
@@ -61,7 +59,7 @@ public class PostponedTransitionTrigger implements RequestListener<Image, GlideD
     }
 
     @Override
-    public boolean onResourceReady(GlideDrawable resource, Image model,
+    public boolean onResourceReady(GlideDrawable resource, String model,
                                    Target<GlideDrawable> target, boolean isFromMemoryCache,
                                    boolean isFirstResource) {
         Log.d(TAG, "start transition on resource ready");

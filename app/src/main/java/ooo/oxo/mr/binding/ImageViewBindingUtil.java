@@ -50,7 +50,7 @@ public class ImageViewBindingUtil {
 
         //noinspection unchecked
         Glide.with(view.getContext())
-                .load(image)
+                .load(image.url)
                 .thumbnail(thumbnailRequest)
                 .listener(listener)
                 .into(new GlideDrawableImageViewTarget(view) {

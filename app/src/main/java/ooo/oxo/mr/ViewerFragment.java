@@ -26,18 +26,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.trello.rxlifecycle.components.support.RxFragment;
-
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 import ooo.oxo.mr.databinding.ViewerFragmentBinding;
 import ooo.oxo.mr.model.Image;
 import ooo.oxo.mr.util.PostponedTransitionTrigger;
+import ooo.oxo.mr.widget.RxBindingFragment;
 
-public class ViewerFragment extends RxFragment {
+public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
     private static final String TAG = "ViewerFragment";
-
-    private ViewerFragmentBinding binding;
 
     private PostponedTransitionTrigger transitionTrigger;
 
@@ -46,9 +43,10 @@ public class ViewerFragment extends RxFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = ViewerFragmentBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+    public ViewerFragmentBinding onCreateBinding(LayoutInflater inflater,
+                                                 @Nullable ViewGroup container,
+                                                 @Nullable Bundle savedInstanceState) {
+        return ViewerFragmentBinding.inflate(inflater, container, false);
     }
 
     @Override

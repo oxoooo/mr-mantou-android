@@ -19,25 +19,19 @@
 package ooo.oxo.mr;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.databinding.ObservableList;
 import android.view.ViewGroup;
-
-import java.util.List;
 
 import ooo.oxo.mr.databinding.MainGridItemBinding;
 import ooo.oxo.mr.model.Image;
-import ooo.oxo.mr.widget.RecyclerViewBindingHolder;
+import ooo.oxo.mr.widget.BindingRecyclerView;
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
+public class MainAdapter extends BindingRecyclerView.ListAdapter<Image, MainAdapter.ViewHolder> {
 
-    private final LayoutInflater inflater;
-    private final List<Image> data;
     private final Listener listener;
 
-    public MainAdapter(Context context, List<Image> data, Listener listener) {
-        this.inflater = LayoutInflater.from(context);
-        this.data = data;
+    public MainAdapter(Context context, ObservableList<Image> data, Listener listener) {
+        super(context, data);
         this.listener = listener;
         setHasStableIds(true);
     }
@@ -65,18 +59,13 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ViewHolder> {
         return data.get(position).id.hashCode();
     }
 
-    @Override
-    public int getItemCount() {
-        return data.size();
-    }
-
     public interface Listener {
 
         void onImageClick(ViewHolder holder);
 
     }
 
-    public class ViewHolder extends RecyclerViewBindingHolder<MainGridItemBinding> {
+    public class ViewHolder extends BindingRecyclerView.ViewHolder<MainGridItemBinding> {
 
         public ViewHolder(MainGridItemBinding binding) {
             super(binding);

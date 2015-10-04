@@ -54,8 +54,6 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
 
     private MainActivityBinding binding;
 
-    private MrApplication application;
-
     private ImageApi imageApi;
 
     @Override
@@ -66,13 +64,11 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
 
         setSupportActionBar(binding.toolbar);
 
-        binding.setImages(images);
-
         binding.content.setAdapter(new MainAdapter(this, images, this));
 
         binding.refresher.setColorSchemeResources(R.color.accent);
 
-        application = MrApplication.from(this);
+        MrApplication application = MrApplication.from(this);
 
         imageApi = application.createApi(ImageApi.class);
 
