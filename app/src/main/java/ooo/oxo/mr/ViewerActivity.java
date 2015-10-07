@@ -20,6 +20,8 @@ package ooo.oxo.mr;
 
 import android.annotation.TargetApi;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -43,6 +45,8 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
             | View.SYSTEM_UI_FLAG_FULLSCREEN;
 
     private ViewerActivityBinding binding;
+
+    private ColorDrawable background;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,9 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
         } else {
             fadeIn();
         }
+
+        background = new ColorDrawable(Color.BLACK);
+        getWindow().getDecorView().setBackground(background);
     }
 
     void fadeIn() {
@@ -105,11 +112,7 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
     @Override
     public void onPull(float progress) {
         progress = Math.min(1f, progress * 3f);
-
-        getWindow().getDecorView().getBackground().setAlpha((int) (0xff * (1f - progress)));
-        //if (binding.toolbar.getAlpha() != 0) {
-        //    binding.toolbar.setAlpha(1.01f - progress);
-        //}
+        background.setAlpha((int) (0xff * (1f - progress)));
     }
 
     @Override
