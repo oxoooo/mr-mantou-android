@@ -39,7 +39,7 @@
 
         </ooo.oxo.mr.widget.PullBackLayout>
 
-        <android.support.v7.widget.Toolbar
+        <ooo.oxo.mr.widget.OhToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -66,8 +66,6 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
 
         binding.content.setAdapter(new MainAdapter(this, images, this));
 
-        binding.refresher.setColorSchemeResources(R.color.accent);
-
         MrApplication application = MrApplication.from(this);
 
         imageApi = application.createApi(ImageApi.class);

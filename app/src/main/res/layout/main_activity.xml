@@ -31,7 +31,7 @@
             android:fitsSystemWindows="true"
             android:visibility="invisible" />
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <ooo.oxo.mr.widget.OhSwipeRefreshLayout
             android:id="@+id/refresher"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -53,7 +53,7 @@
                 app:spanCount="2"
                 tools:padding="8dp" />
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </ooo.oxo.mr.widget.OhSwipeRefreshLayout>
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar"
