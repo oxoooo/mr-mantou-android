@@ -2,6 +2,11 @@
 
 ## Build
 
+### Requirements
+
+- Android SDK Platform 23
+- Android Support Repository 22
+
 ```shell
 ./gradlew build
 ```
