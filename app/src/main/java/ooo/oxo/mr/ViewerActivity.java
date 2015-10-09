@@ -69,7 +69,7 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
         }
 
         background = new ColorDrawable(Color.BLACK);
-        getWindow().getDecorView().setBackground(background);
+        binding.getRoot().setBackground(background);
     }
 
     void fadeIn() {
