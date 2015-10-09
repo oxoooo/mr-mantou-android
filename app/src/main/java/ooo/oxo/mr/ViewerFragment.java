@@ -21,7 +21,6 @@ package ooo.oxo.mr;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,9 +52,6 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         Intent intent = getActivity().getIntent();
         Image image = intent.getParcelableExtra("image");
-
-        ViewCompat.setTransitionName(binding.image,
-                String.format("%s.image", image.id));
 
         binding.image.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
         binding.image.setSingleTapListener(((ViewerActivity) getActivity())::toggleFade);

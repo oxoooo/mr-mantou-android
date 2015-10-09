@@ -41,8 +41,10 @@
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:transitionName="@{image.id + `.image`}"
         app:listener="@{listener}"
         app:originalImage="@{image}"
-        app:thumbnail="@{thumbnail}" />
+        app:thumbnail="@{thumbnail}"
+        tools:ignore="UnusedAttribute" />
 
 </layout>
