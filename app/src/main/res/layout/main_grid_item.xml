@@ -40,6 +40,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:image="@{image}"
+            app:originalHeight="@{image.meta.height}"
+            app:originalWidth="@{image.meta.width}"
             tools:layout_height="match_parent" />
 
     </FrameLayout>

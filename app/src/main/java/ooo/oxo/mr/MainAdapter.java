@@ -45,7 +45,10 @@ public class MainAdapter extends BindingRecyclerView.ListAdapter<Image, MainAdap
     public void onBindViewHolder(ViewHolder holder, int position) {
         Image image = data.get(position);
         holder.binding.setImage(image);
-        holder.binding.image.setOriginalSize(image.meta.width, image.meta.height);
+
+        // execute the binding immediately to ensure the original size of RatioImageView is set
+        // before layout
+        holder.binding.executePendingBindings();
     }
 
     @Override
