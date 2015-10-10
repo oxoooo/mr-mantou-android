@@ -25,8 +25,7 @@ import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
-import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
 
 import ooo.oxo.mr.model.Image;
 
@@ -53,12 +52,8 @@ public class ImageViewBindingUtil {
                 .load(image.url)
                 .thumbnail(thumbnailRequest)
                 .listener(listener)
-                .into(new GlideDrawableImageViewTarget(view) {
-                    @Override
-                    public void getSize(SizeReadyCallback cb) {
-                        cb.onSizeReady(SIZE_ORIGINAL, SIZE_ORIGINAL);
-                    }
-                });
+                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .into(view);
     }
 
 }

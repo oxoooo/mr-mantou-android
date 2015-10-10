@@ -68,6 +68,12 @@ public class Image implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return String.format("Image#%s[createdAt: %s, url: %s, channel: %s, meta: %s]",
+                id, getUTCCreatedAt(), url, channel, meta);
+    }
+
+    @Override
     public boolean equals(Object o) {
         return (o == this) || (o instanceof Image && id.equals(((Image) o).id));
     }
@@ -114,6 +120,12 @@ public class Image implements Parcelable {
             width = in.readInt();
             height = in.readInt();
             colors = in.createTypedArrayList(Color.CREATOR);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Meta[type: %s, width: %d, height: %d, colors: %s]",
+                    type, width, height, colors.toString());
         }
 
         @Override
