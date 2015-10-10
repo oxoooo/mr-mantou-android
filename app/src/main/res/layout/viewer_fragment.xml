@@ -35,6 +35,8 @@
             name="listener"
             type="com.bumptech.glide.request.RequestListener" />
 
+        <import type="it.sephiroth.android.library.imagezoom.ImageViewTouchBase.DisplayType" />
+
     </data>
 
     <it.sephiroth.android.library.imagezoom.ImageViewTouch
@@ -42,6 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:transitionName="@{image.id + `.image`}"
+        app:displayType="@{DisplayType.FIT_TO_SCREEN}"
         app:listener="@{listener}"
         app:originalImage="@{image}"
         app:thumbnail="@{thumbnail}"

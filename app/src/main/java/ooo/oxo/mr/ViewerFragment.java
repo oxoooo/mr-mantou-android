@@ -25,7 +25,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 import ooo.oxo.mr.databinding.ViewerFragmentBinding;
 import ooo.oxo.mr.model.Image;
 import ooo.oxo.mr.util.PostponedTransitionTrigger;
@@ -53,7 +52,6 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
         Intent intent = getActivity().getIntent();
         Image image = intent.getParcelableExtra("image");
 
-        binding.image.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
         binding.image.setSingleTapListener(((ViewerActivity) getActivity())::toggleFade);
         binding.image.setDoubleTapListener(((ViewerActivity) getActivity())::fadeOut);
 
