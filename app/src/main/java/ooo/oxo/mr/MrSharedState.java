@@ -16,18 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ooo.oxo.mr.rx;
+package ooo.oxo.mr;
 
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.databinding.ObservableArrayList;
 
-import rx.Observable;
+import ooo.oxo.mr.model.Image;
 
-public class RxNetworking {
+public class MrSharedState {
 
-    public static <T> Observable.Transformer<T, T> bindRefreshing(SwipeRefreshLayout indicator) {
-        return observable -> observable
-                .doOnSubscribe(() -> indicator.post(() -> indicator.setRefreshing(true)))
-                .doOnCompleted(() -> indicator.post(() -> indicator.setRefreshing(false)));
+    private static MrSharedState instance;
+
+    private final ObservableArrayList<Image> images = new ObservableArrayList<>();
+
+    public static MrSharedState getInstance() {
+        return instance;
+    }
+
+    static void createInstance() {
+        instance = new MrSharedState();
+    }
+
+    public ObservableArrayList<Image> getImages() {
+        return images;
     }
 
 }

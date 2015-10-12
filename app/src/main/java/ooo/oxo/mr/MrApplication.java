@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.leakcanary.LeakCanary;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.util.HashMap;
@@ -71,6 +72,10 @@ public class MrApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        LeakCanary.install(this);
+
+        MrSharedState.createInstance();
 
         httpClient = new OkHttpClient();
 

@@ -25,11 +25,14 @@ import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 
 public class PullBackLayout extends FrameLayout {
 
     private final ViewDragHelper dragger;
+
+    private final int minimumFlingVelocity;
 
     @Nullable
     private Callback callback;
@@ -44,7 +47,8 @@ public class PullBackLayout extends FrameLayout {
 
     public PullBackLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        dragger = ViewDragHelper.create(this, 0.5f, new ViewDragCallback());
+        dragger = ViewDragHelper.create(this, 1f / 8f, new ViewDragCallback());
+        minimumFlingVelocity = ViewConfiguration.get(context).getScaledMinimumFlingVelocity();
     }
 
     public void setCallback(@Nullable Callback callback) {
@@ -126,7 +130,8 @@ public class PullBackLayout extends FrameLayout {
 
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
-            if (yvel > 0 || (yvel == 0 && releasedChild.getTop() > (float) getHeight() / 3f)) {
+            int slop = yvel > minimumFlingVelocity ? getHeight() / 6 : getHeight() / 3;
+            if (releasedChild.getTop() > slop) {
                 if (callback != null) {
                     callback.onPullComplete();
                 }

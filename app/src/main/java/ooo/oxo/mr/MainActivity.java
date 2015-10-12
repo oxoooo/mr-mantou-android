@@ -34,6 +34,8 @@ import android.widget.Toast;
 import com.jakewharton.rxbinding.support.v4.widget.RxSwipeRefreshLayout;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
+import java.util.List;
+
 import ooo.oxo.mr.api.ImageApi;
 import ooo.oxo.mr.api.VersionApi;
 import ooo.oxo.mr.databinding.MainActivityBinding;
@@ -43,6 +45,7 @@ import ooo.oxo.mr.net.QiniuImageQueryBuilder;
 import ooo.oxo.mr.rx.RxEndlessRecyclerView;
 import ooo.oxo.mr.rx.RxList;
 import ooo.oxo.mr.rx.RxNetworking;
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -50,11 +53,16 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
 
     private static final String TAG = "MainActivity";
 
-    private final ObservableArrayList<Image> images = new ObservableArrayList<>();
+    private ObservableArrayList<Image> images;
 
     private MainActivityBinding binding;
 
     private ImageApi imageApi;
+    private VersionApi versionApi;
+
+    private Observable<List<Image>> observableLoadLatest;
+    private Observable<List<Image>> observableLoadBefore;
+    private Observable<Version> observableCheckUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,29 +72,28 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
 
         setSupportActionBar(binding.toolbar);
 
+        images = MrSharedState.getInstance().getImages();
+
         binding.content.setAdapter(new MainAdapter(this, images, this));
 
         MrApplication application = MrApplication.from(this);
 
         imageApi = application.createApi(ImageApi.class);
+        versionApi = application.createApi(VersionApi.class);
 
-        RxEndlessRecyclerView.reachesEnd(binding.content).map(images::get)
-                .compose(bindToLifecycle())
-                .flatMap(last -> imageApi.before(null, last.getUTCCreatedAt())
-                        .compose(RxNetworking.bindNetworking(this, binding.refresher)))
-                .subscribe(RxList.appendTo(images), this::showError);
+        createObservables();
+        attachObservables();
+    }
 
-        RxSwipeRefreshLayout.refreshes(binding.refresher)
-                .compose(bindToLifecycle())
-                .flatMap(event -> {
-                    if (images.isEmpty()) {
-                        return imageApi.latest(null)
-                                .compose(RxNetworking.bindNetworking(this, binding.refresher));
-                    } else {
-                        return imageApi.since(null, images.get(0).getUTCCreatedAt())
-                                .compose(RxNetworking.bindNetworking(this, binding.refresher));
-                    }
-                })
+    private void createObservables() {
+        Observable.Transformer<List<Image>, List<Image>> networkingIndicator =
+                RxNetworking.bindRefreshing(binding.refresher);
+
+        observableLoadLatest = Observable
+                .defer(() -> images.isEmpty()
+                        ? imageApi.latest(null)
+                        : imageApi.since(null, images.get(0).getUTCCreatedAt()))
+                .doOnUnsubscribe(() -> Log.d("RxJava", "unsubscribe load latest"))
                 .map(images -> {
                     // for a strange bug of pg sql
                     if (!images.isEmpty() && images.get(images.size() - 1).equals(images.get(0))) {
@@ -95,18 +102,50 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
 
                     return images;
                 })
-                .subscribe(RxList.prependTo(images), this::showError);
-
-        imageApi.latest(null)
-                .compose(RxNetworking.bindNetworking(this, binding.refresher))
-                .subscribe(RxList.appendTo(images), this::showError);
-
-        application.createApi(VersionApi.class).check()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
+                .compose(networkingIndicator);
+
+        observableLoadBefore = Observable
+                .defer(() -> imageApi.before(null, images.get(images.size() - 1).getUTCCreatedAt()))
+                .doOnUnsubscribe(() -> Log.d("RxJava", "unsubscribe load before"))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(networkingIndicator);
+
+        observableCheckUpdate = versionApi.check()
+                .doOnUnsubscribe(() -> Log.d("RxJava", "unsubscribe check update"))
                 .filter(version -> version.versionCode > BuildConfig.VERSION_CODE)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private void attachObservables() {
+        RxEndlessRecyclerView.reachesEnd(binding.content)
+                .doOnUnsubscribe(() -> Log.d("RxJava", "unsubscribe recycler view"))
+                .flatMap(avoid -> observableLoadBefore)
+                .compose(bindToLifecycle())
+                .subscribe(RxList.appendTo(images), this::showError);
+
+        RxSwipeRefreshLayout.refreshes(binding.refresher)
+                .doOnUnsubscribe(() -> Log.d("RxJava", "unsubscribe swipe refresh layout"))
+                .flatMap(avoid -> observableLoadLatest)
+                .compose(bindToLifecycle())
+                .subscribe(RxList.prependTo(images), this::showError);
+
+        observableLoadLatest
+                .compose(bindToLifecycle())
+                .subscribe(RxList.appendTo(images), this::showError);
+
+        observableCheckUpdate
+                .compose(bindToLifecycle())
                 .subscribe(this::promptUpdate, error -> Log.e(TAG, "fail to check update", error));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding.content.setAdapter(null);
     }
 
     private void showError(Throwable error) {
