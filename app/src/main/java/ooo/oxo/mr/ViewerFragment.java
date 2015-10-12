@@ -18,7 +18,6 @@
 
 package ooo.oxo.mr;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -49,8 +48,7 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        Intent intent = getActivity().getIntent();
-        Image image = intent.getParcelableExtra("image");
+        Image image = getArguments().getParcelable("image");
 
         binding.image.setSingleTapListener(((ViewerActivity) getActivity())::toggleFade);
         binding.image.setDoubleTapListener(((ViewerActivity) getActivity())::fadeOut);
@@ -58,7 +56,7 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
         transitionTrigger = new PostponedTransitionTrigger((ViewerActivity) getActivity());
 
         binding.setImage(image);
-        binding.setThumbnail(intent.getStringExtra("thumbnail"));
+        binding.setThumbnail(getArguments().getString("thumbnail"));
         binding.setListener(transitionTrigger);
     }
 
@@ -68,8 +66,8 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
         transitionTrigger.cancel();
     }
 
-    boolean canScroll() {
-        return binding.image.canScroll();
+    View getSharedElement() {
+        return binding.image;
     }
 
 }

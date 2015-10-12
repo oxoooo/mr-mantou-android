@@ -30,12 +30,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <fragment
-                android:id="@+id/viewer"
-                android:name="ooo.oxo.mr.ViewerFragment"
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:layout="@layout/viewer_fragment" />
+                android:layout_height="match_parent" />
 
         </ooo.oxo.mr.widget.PullBackLayout>
 

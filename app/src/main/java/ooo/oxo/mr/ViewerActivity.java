@@ -19,24 +19,70 @@
 package ooo.oxo.mr;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.databinding.ObservableArrayList;
+import android.databinding.ObservableList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.SharedElementCallback;
 import android.transition.Transition;
+import android.view.View;
 
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
+import java.util.List;
+import java.util.Map;
+
 import ooo.oxo.mr.databinding.ViewerActivityBinding;
+import ooo.oxo.mr.model.Image;
 import ooo.oxo.mr.util.SimpleTransitionListener;
 import ooo.oxo.mr.widget.ImmersiveUtil;
 import ooo.oxo.mr.widget.PullBackLayout;
 
 public class ViewerActivity extends RxAppCompatActivity implements PullBackLayout.Callback {
 
+    private final ObservableArrayList<Image> images = MrSharedState.getInstance().getImages();
+
     private ViewerActivityBinding binding;
+
+    private Adapter adapter;
+
+    private final ObservableList.OnListChangedCallback<ObservableList<Image>> listener =
+            new ObservableList.OnListChangedCallback<ObservableList<Image>>() {
+                @Override
+                public void onChanged(ObservableList<Image> sender) {
+                    adapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onItemRangeChanged(ObservableList<Image> sender,
+                                               int positionStart, int itemCount) {
+                    adapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onItemRangeInserted(ObservableList<Image> sender,
+                                                int positionStart, int itemCount) {
+                    adapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onItemRangeMoved(ObservableList<Image> sender,
+                                             int fromPosition, int toPosition, int itemCount) {
+                    adapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onItemRangeRemoved(ObservableList<Image> sender,
+                                               int positionStart, int itemCount) {
+                    adapter.notifyDataSetChanged();
+                }
+            };
 
     private ColorDrawable background;
 
@@ -70,6 +116,28 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
 
         background = new ColorDrawable(Color.BLACK);
         binding.getRoot().setBackground(background);
+
+        adapter = new Adapter();
+
+        binding.pager.setAdapter(adapter);
+        binding.pager.setCurrentItem(getIntent().getIntExtra("index", 0));
+
+        images.addOnListChangedCallback(listener);
+
+        setEnterSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                Image image = images.get(binding.pager.getCurrentItem());
+                sharedElements.clear();
+                sharedElements.put(String.format("%s.image", image.id), getCurrent().getSharedElement());
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        images.removeOnListChangedCallback(listener);
     }
 
     void fadeIn() {
@@ -120,15 +188,49 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
         supportFinishAfterTransition();
     }
 
-    @Override
-    public boolean canPullDown() {
-        ViewerFragment current = getCurrent();
-        return current != null && !current.canScroll();
+    public ViewerFragment getCurrent() {
+        return (ViewerFragment) adapter.instantiateItem(binding.pager, binding.pager.getCurrentItem());
     }
 
-    @Nullable
-    private ViewerFragment getCurrent() {
-        return (ViewerFragment) getSupportFragmentManager().findFragmentById(R.id.viewer);
+    @Override
+    public void supportFinishAfterTransition() {
+        Intent data = new Intent();
+        data.putExtra("index", binding.pager.getCurrentItem());
+        setResult(RESULT_OK, data);
+
+        showSystemUi();
+
+        super.supportFinishAfterTransition();
+    }
+
+    private class Adapter extends FragmentStatePagerAdapter {
+
+        public Adapter() {
+            super(getSupportFragmentManager());
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            Image image = images.get(position);
+
+            Bundle arguments = new Bundle();
+            arguments.putParcelable("image", image);
+
+            if (position == getIntent().getIntExtra("index", 0)) {
+                arguments.putString("thumbnail", getIntent().getStringExtra("thumbnail"));
+            }
+
+            Fragment fragment = new ViewerFragment();
+            fragment.setArguments(arguments);
+
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return images.size();
+        }
+
     }
 
 }

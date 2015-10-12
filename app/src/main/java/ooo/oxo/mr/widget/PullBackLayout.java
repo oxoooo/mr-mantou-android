@@ -83,15 +83,13 @@ public class PullBackLayout extends FrameLayout {
 
         void onPullComplete();
 
-        boolean canPullDown();
-
     }
 
     private class ViewDragCallback extends ViewDragHelper.Callback {
 
         @Override
         public boolean tryCaptureView(View child, int pointerId) {
-            return callback != null && callback.canPullDown();
+            return true;
         }
 
         @Override

@@ -24,17 +24,21 @@ import android.databinding.ObservableArrayList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.jakewharton.rxbinding.support.v4.widget.RxSwipeRefreshLayout;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.List;
+import java.util.Map;
 
 import ooo.oxo.mr.api.ImageApi;
 import ooo.oxo.mr.api.VersionApi;
@@ -64,6 +68,8 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
     private Observable<List<Image>> observableLoadBefore;
     private Observable<Version> observableCheckUpdate;
 
+    private Bundle reenterState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +89,25 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
 
         createObservables();
         attachObservables();
+
+        setExitSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                if (reenterState != null) {
+                    int index = reenterState.getInt("index", 0);
+
+                    Image image = images.get(index);
+
+                    MainAdapter.ViewHolder holder = (MainAdapter.ViewHolder) binding.content
+                            .findViewHolderForLayoutPosition(index);
+
+                    sharedElements.clear();
+                    sharedElements.put(String.format("%s.image", image.id), holder.binding.image);
+
+                    reenterState = null;
+                }
+            }
+        });
     }
 
     private void createObservables() {
@@ -171,7 +196,7 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
         Image image = images.get(holder.getAdapterPosition());
 
         Intent intent = new Intent(this, ViewerActivity.class);
-        intent.putExtra("image", image);
+        intent.putExtra("index", holder.getAdapterPosition());
         intent.putExtra("thumbnail", QiniuImageQueryBuilder.build(
                 image.url, holder.binding.image.getWidth()));
 
@@ -179,6 +204,27 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
                 this, holder.binding.image, String.format("%s.image", image.id));
 
         startActivity(intent, options.toBundle());
+    }
+
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+
+        supportPostponeEnterTransition();
+
+        reenterState = new Bundle(data.getExtras());
+
+        final int index = reenterState.getInt("index", 0);
+
+        binding.content.scrollToPosition(index);
+        binding.content.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                binding.content.getViewTreeObserver().removeOnPreDrawListener(this);
+                supportStartPostponedEnterTransition();
+                return true;
+            }
+        });
     }
 
     @Override
