@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ooo.oxo.mr.widget.PullBackLayout
+        <ooo.oxo.library.widget.PullBackLayout
             android:id="@+id/puller"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-        </ooo.oxo.mr.widget.PullBackLayout>
+        </ooo.oxo.library.widget.PullBackLayout>
 
         <ooo.oxo.mr.widget.OhToolbar
             android:id="@+id/toolbar"

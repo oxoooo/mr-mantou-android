@@ -38,11 +38,11 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import java.util.List;
 import java.util.Map;
 
+import ooo.oxo.library.widget.PullBackLayout;
 import ooo.oxo.mr.databinding.ViewerActivityBinding;
 import ooo.oxo.mr.model.Image;
 import ooo.oxo.mr.util.SimpleTransitionListener;
 import ooo.oxo.mr.widget.ImmersiveUtil;
-import ooo.oxo.mr.widget.PullBackLayout;
 
 public class ViewerActivity extends RxAppCompatActivity implements PullBackLayout.Callback {
 
