@@ -102,7 +102,10 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
                             .findViewHolderForLayoutPosition(index);
 
                     sharedElements.clear();
-                    sharedElements.put(String.format("%s.image", image.id), holder.binding.image);
+
+                    if (holder != null && holder.binding != null) {
+                        sharedElements.put(String.format("%s.image", image.id), holder.binding.image);
+                    }
 
                     reenterState = null;
                 }
@@ -214,9 +217,7 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
 
         reenterState = new Bundle(data.getExtras());
 
-        final int index = reenterState.getInt("index", 0);
-
-        binding.content.scrollToPosition(index);
+        binding.content.smoothScrollToPosition(reenterState.getInt("index", 0));
         binding.content.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {

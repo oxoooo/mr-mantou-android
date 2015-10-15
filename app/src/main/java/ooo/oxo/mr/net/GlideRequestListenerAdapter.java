@@ -16,25 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ooo.oxo.mr.binding;
+package ooo.oxo.mr.net;
 
-import android.databinding.BindingAdapter;
-import android.widget.ImageView;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+public class GlideRequestListenerAdapter<T, R> implements RequestListener<T, R> {
 
-import ooo.oxo.mr.model.Image;
+    @Override
+    public boolean onException(Exception e, T model, Target<R> target, boolean isFirstResource) {
+        onComplete();
+        return false;
+    }
 
-@SuppressWarnings("unused")
-public class ImageViewBindingUtil {
+    @Override
+    public boolean onResourceReady(R resource, T model, Target<R> target,
+                                   boolean isFromMemoryCache, boolean isFirstResource) {
+        onComplete();
+        onSuccess(resource);
+        return false;
+    }
 
-    @BindingAdapter("bind:image")
-    public static void loadUrl(ImageView view, Image image) {
-        Glide.with(view.getContext())
-                .load(image)
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .into(view);
+    protected void onComplete() {
+    }
+
+    protected void onSuccess(R resource) {
     }
 
 }

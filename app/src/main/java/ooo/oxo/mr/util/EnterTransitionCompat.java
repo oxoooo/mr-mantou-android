@@ -16,25 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ooo.oxo.mr.binding;
+package ooo.oxo.mr.util;
 
-import android.databinding.BindingAdapter;
-import android.widget.ImageView;
+import android.os.Build;
+import android.transition.Transition;
+import android.view.Window;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+public class EnterTransitionCompat {
 
-import ooo.oxo.mr.model.Image;
+    public static void addListener(Window window, Transition.TransitionListener listener) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.getEnterTransition().addListener(listener);
+        }
+    }
 
-@SuppressWarnings("unused")
-public class ImageViewBindingUtil {
-
-    @BindingAdapter("bind:image")
-    public static void loadUrl(ImageView view, Image image) {
-        Glide.with(view.getContext())
-                .load(image)
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .into(view);
+    public static void removeListener(Window window, Transition.TransitionListener listener) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.getEnterTransition().removeListener(listener);
+        }
     }
 
 }

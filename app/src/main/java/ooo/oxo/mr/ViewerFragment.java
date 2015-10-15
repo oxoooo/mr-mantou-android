@@ -18,24 +18,52 @@
 
 package ooo.oxo.mr;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.target.Target;
+
 import ooo.oxo.mr.databinding.ViewerFragmentBinding;
 import ooo.oxo.mr.model.Image;
-import ooo.oxo.mr.util.PostponedTransitionTrigger;
+import ooo.oxo.mr.net.GlideRequestListenerAdapter;
+import ooo.oxo.mr.util.EnterTransitionCompat;
+import ooo.oxo.mr.util.SimpleTransitionListener;
 import ooo.oxo.mr.widget.RxBindingFragment;
 
 public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
     private static final String TAG = "ViewerFragment";
 
-    private PostponedTransitionTrigger transitionTrigger;
+    private Image image;
+    private String thumbnail;
+
+    private boolean hasSharedElementTransition = false;
+
+    private View sharedElement;
 
     public ViewerFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        image = getArguments().getParcelable("image");
+        thumbnail = getArguments().getString("thumbnail");
+
+        hasSharedElementTransition = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
+                !TextUtils.isEmpty(thumbnail);
     }
 
     @Nullable
@@ -48,26 +76,77 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        Image image = getArguments().getParcelable("image");
-
         binding.image.setSingleTapListener(((ViewerActivity) getActivity())::toggleFade);
         binding.image.setDoubleTapListener(((ViewerActivity) getActivity())::fadeOut);
 
-        transitionTrigger = new PostponedTransitionTrigger((ViewerActivity) getActivity());
-
         binding.setImage(image);
-        binding.setThumbnail(getArguments().getString("thumbnail"));
-        binding.setListener(transitionTrigger);
-    }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        transitionTrigger.cancel();
+        sharedElement = binding.thumbnail;
+
+        loadImage();
     }
 
     View getSharedElement() {
-        return binding.image;
+        return sharedElement;
+    }
+
+    private void startPostponedEnterTransition() {
+        if (hasSharedElementTransition) {
+            getActivity().supportStartPostponedEnterTransition();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void loadImage() {
+        if (hasSharedElementTransition) {
+            loadThumbnail();
+            EnterTransitionCompat.addListener(getActivity().getWindow(), new SimpleTransitionListener() {
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    EnterTransitionCompat.removeListener(getActivity().getWindow(), this);
+                    loadFullImage();
+                }
+            });
+        } else {
+            loadFullImage();
+        }
+    }
+
+    private void loadThumbnail() {
+        Glide.with(this).load(thumbnail)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .crossFade(0)
+                .listener(new GlideRequestListenerAdapter<String, GlideDrawable>() {
+                    @Override
+                    protected void onComplete() {
+                        startPostponedEnterTransition();
+                    }
+                })
+                .into(binding.thumbnail);
+    }
+
+    private void loadFullImage() {
+        Glide.with(this).load(image.url)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .crossFade(0)
+                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .listener(new GlideRequestListenerAdapter<String, GlideDrawable>() {
+                    @Override
+                    protected void onSuccess(GlideDrawable resource) {
+                        sharedElement = binding.image;
+                        fadeInFullImage();
+                    }
+                })
+                .into(binding.image);
+    }
+
+    private void fadeInFullImage() {
+        binding.image.animate().alpha(1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                binding.thumbnail.setVisibility(View.GONE);
+            }
+        }).start();
     }
 
 }
