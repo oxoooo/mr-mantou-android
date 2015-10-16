@@ -29,4 +29,7 @@
     <string name="update_confirm">现在下载</string>
     <string name="update_cancel">取消</string>
 
+    <string name="share">分享</string>
+    <string name="share_title">将这张照片分享到…</string>
+
 </resources>

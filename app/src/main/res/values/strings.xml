@@ -29,4 +29,7 @@
     <string name="update_confirm">Download Now</string>
     <string name="update_cancel">Cancel</string>
 
+    <string name="share">Share</string>
+    <string name="share_title">Share this photo to…</string>
+
 </resources>
