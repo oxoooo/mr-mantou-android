@@ -50,7 +50,12 @@ public class MrApplication extends Application {
     private Retrofit retrofit;
 
     public static MrApplication from(Context context) {
-        return (MrApplication) context.getApplicationContext();
+        Context application = context.getApplicationContext();
+        if (application instanceof MrApplication) {
+            return (MrApplication) application;
+        } else {
+            throw new IllegalArgumentException("context must be from MrApplication");
+        }
     }
 
     private String buildAcceptLanguage() {

@@ -60,17 +60,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ooo.oxo.mr.widget.StatusBarHolderView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|enterAlways" />
+                android:orientation="vertical"
+                app:layout_scrollFlags="scroll|enterAlways|snap">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:title="@string/app_name" />
+                <ooo.oxo.mr.widget.StatusBarHolderView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/app_name" />
+
+            </LinearLayout>
 
         </android.support.design.widget.AppBarLayout>
 
