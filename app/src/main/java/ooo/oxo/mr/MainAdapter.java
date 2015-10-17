@@ -22,9 +22,9 @@ import android.content.Context;
 import android.databinding.ObservableList;
 import android.view.ViewGroup;
 
+import ooo.oxo.library.databinding.support.widget.BindingRecyclerView;
 import ooo.oxo.mr.databinding.MainGridItemBinding;
 import ooo.oxo.mr.model.Image;
-import ooo.oxo.mr.widget.BindingRecyclerView;
 
 public class MainAdapter extends BindingRecyclerView.ListAdapter<Image, MainAdapter.ViewHolder> {
 

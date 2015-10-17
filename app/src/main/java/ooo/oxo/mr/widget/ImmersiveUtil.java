@@ -31,8 +31,7 @@ public class ImmersiveUtil {
     }
 
     public static void exit(View view) {
-        int flags = view.getSystemUiVisibility();
-        view.setSystemUiVisibility(flags & (~SYSTEM_UI_IMMERSIVE));
+        view.setSystemUiVisibility(view.getSystemUiVisibility() & (~SYSTEM_UI_IMMERSIVE));
     }
 
 }

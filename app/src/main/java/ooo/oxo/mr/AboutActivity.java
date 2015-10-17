@@ -28,10 +28,10 @@ import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import ooo.oxo.library.databinding.support.widget.BindingRecyclerView;
 import ooo.oxo.mr.databinding.AboutActivityBinding;
 import ooo.oxo.mr.databinding.AboutHeaderBinding;
 import ooo.oxo.mr.databinding.AboutLibraryItemBinding;
-import ooo.oxo.mr.widget.BindingRecyclerView;
 
 public class AboutActivity extends AppCompatActivity {
 
