@@ -38,7 +38,7 @@
             android:transitionName="@{image.id + `.image`}"
             tools:ignore="ContentDescription,UnusedAttribute" />
 
-        <ooo.oxo.mr.widget.TouchImageView
+        <ooo.oxo.library.widget.TouchImageView
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
