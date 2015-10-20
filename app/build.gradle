@@ -116,7 +116,7 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding-design:0.2.0'
     compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.2.0'
 
-    compile 'com.github.oxoooo:pull-back-layout:1.0.0'
-    compile 'com.github.oxoooo:touch-image-view:1.0.0'
-    compile 'com.github.oxoooo:data-binding-support:1.0.0'
+    compile 'com.github.oxoooo:pull-back-layout:1.0.1'
+    compile 'com.github.oxoooo:touch-image-view:1.0.1'
+    compile 'com.github.oxoooo:data-binding-support:1.1.0'
 }
