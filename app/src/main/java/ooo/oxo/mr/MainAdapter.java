@@ -22,17 +22,25 @@ import android.content.Context;
 import android.databinding.ObservableList;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import ooo.oxo.library.databinding.support.widget.BindingRecyclerView;
 import ooo.oxo.mr.databinding.MainGridItemBinding;
 import ooo.oxo.mr.model.Image;
 
 public class MainAdapter extends BindingRecyclerView.ListAdapter<Image, MainAdapter.ViewHolder> {
 
+    private final RequestManager requestManager;
     private final Listener listener;
 
-    public MainAdapter(Context context, ObservableList<Image> data, Listener listener) {
+    public MainAdapter(Context context, ObservableList<Image> data, RequestManager requestManager,
+                       Listener listener) {
         super(context, data);
+
+        this.requestManager = requestManager;
         this.listener = listener;
+
         setHasStableIds(true);
     }
 
@@ -49,6 +57,10 @@ public class MainAdapter extends BindingRecyclerView.ListAdapter<Image, MainAdap
         // execute the binding immediately to ensure the original size of RatioImageView is set
         // before layout
         holder.binding.executePendingBindings();
+
+        requestManager.load(image)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(holder.binding.image);
     }
 
     @Override

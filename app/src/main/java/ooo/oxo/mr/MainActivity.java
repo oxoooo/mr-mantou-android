@@ -34,6 +34,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.MemoryCategory;
 import com.jakewharton.rxbinding.support.v4.widget.RxSwipeRefreshLayout;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
@@ -80,7 +82,8 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
 
         images = MrSharedState.getInstance().getImages();
 
-        binding.content.setAdapter(new MainAdapter(this, images, this));
+        Glide.get(this).setMemoryCategory(MemoryCategory.HIGH);
+        binding.content.setAdapter(new MainAdapter(this, images, Glide.with(this), this));
 
         MrApplication application = MrApplication.from(this);
 
