@@ -21,7 +21,6 @@ package ooo.oxo.mr;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.WallpaperManager;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -32,13 +31,13 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.transition.Transition;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -46,20 +45,21 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.util.concurrent.ExecutionException;
 
 import ooo.oxo.mr.databinding.ViewerFragmentBinding;
 import ooo.oxo.mr.model.Image;
 import ooo.oxo.mr.net.GlideRequestListenerAdapter;
+import ooo.oxo.mr.rx.RxFileInputStream;
+import ooo.oxo.mr.rx.RxFiles;
+import ooo.oxo.mr.rx.RxGlide;
+import ooo.oxo.mr.rx.RxWallpaperManager;
 import ooo.oxo.mr.util.EnterTransitionCompat;
 import ooo.oxo.mr.util.SimpleTransitionListener;
+import ooo.oxo.mr.util.ToastUtil;
 import ooo.oxo.mr.widget.RxBindingFragment;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
@@ -81,9 +81,14 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
     public ViewerFragment() {
     }
 
+    private static Observable<File> ensureExternalDirectory(String name) {
+        return RxFiles.mkdirsIfNotExists(new File(Environment.getExternalStorageDirectory(), name));
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         image = getArguments().getParcelable("image");
         thumbnail = getArguments().getString("thumbnail");
 
@@ -92,28 +97,16 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
         setHasOptionsMenu(true);
 
-        observableDownload = Observable.just(Glide.with(this).load(image.url))
-                .map(request -> {
-                    try {
-                        return request.downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        Log.e(TAG, "Failed to download photo", e);
-                        return null;
-                    }
-                })
-                .filter(file -> file != null);
+        observableDownload = RxGlide.download(Glide.with(this), image.url);
 
-        observableSave = observableDownload
-                .map(src -> {
-                    try {
-                        return copy(src, makeExternalFile(String.format("%d.%s",
-                                image.createdAt.getTime(), image.meta.type)));
-                    } catch (IOException e) {
-                        Log.e(TAG, "Failed to save photo", e);
-                        return null;
-                    }
-                })
-                .filter(file -> file != null);
+        observableSave = Observable
+                .combineLatest(
+                        observableDownload,
+                        ensureExternalDirectory("Mr.Mantou"),
+                        (Func2<File, File, Pair<File, File>>) Pair::new)
+                .flatMap(pair -> RxFiles.copy(pair.first,
+                        new File(pair.second, String.format("%d.%s",
+                                image.createdAt.getTime(), image.meta.type))));
     }
 
     @Nullable
@@ -239,10 +232,9 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
                 .compose(bindToLifecycle())
                 .subscribe(file -> {
                     notifyMediaScanning(file);
-                    Toast.makeText(
-                            getContext(),
-                            getString(R.string.save_success, file.getPath()),
-                            Toast.LENGTH_SHORT).show();
+                    ToastUtil.shorts(getContext(), R.string.save_success, file.getPath());
+                }, e -> {
+                    Log.e(TAG, "Failed to save picture", e);
                 });
     }
 
@@ -257,50 +249,29 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
                     intent.setType("image/" + image.meta.type);
                     intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
                     startActivity(Intent.createChooser(intent, getString(R.string.share_title)));
+                }, e -> {
+                    Log.e(TAG, "Failed to save picture", e);
                 });
     }
 
     private void setWallpaper() {
         observableDownload
+                .flatMap(RxFileInputStream::create)
+                .flatMap(stream -> RxWallpaperManager.setStream(getContext(), stream))
                 .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
-                .subscribe(file -> {
-                    try {
-                        WallpaperManager.getInstance(getContext())
-                                .setStream(new FileInputStream(file));
-                    } catch (IOException e) {
-                        Log.e(TAG, "Failed to set wallpaper", e);
-                    }
+                .subscribe(avoid -> {
+                    ToastUtil.shorts(getContext(), R.string.set_wallpaper_success);
+                }, e -> {
+                    Log.e(TAG, "Failed to save picture", e);
                 });
     }
 
-    private File copy(File from, File to) throws IOException {
-        FileInputStream input = new FileInputStream(from);
-        FileOutputStream output = new FileOutputStream(to);
-
-        FileChannel inputChannel = input.getChannel();
-        FileChannel outputChannel = output.getChannel();
-
-        inputChannel.transferTo(0, inputChannel.size(), outputChannel);
-
-        input.close();
-        output.close();
-
-        return to;
-    }
-
-    private File makeExternalFile(String name) throws IOException {
-        File directory = new File(Environment.getExternalStorageDirectory(), "Mr.Mantou");
-        if (!directory.exists() && !directory.mkdirs()) {
-            throw new IOException("Failed to create external directory");
-        }
-
-        return new File(directory, name);
-    }
-
     private void notifyMediaScanning(File file) {
-        MediaScannerConnection.scanFile(getContext(), new String[]{file.getPath()}, null, null);
+        MediaScannerConnection.scanFile(
+                getContext().getApplicationContext(),
+                new String[]{file.getPath()}, null, null);
     }
 
 }

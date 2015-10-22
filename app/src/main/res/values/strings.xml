@@ -36,5 +36,6 @@
     <string name="save_success">Saved photo to: %s</string>
 
     <string name="set_wallpaper">Set as wallpaper</string>
+    <string name="set_wallpaper_success">Wallpaper is set</string>
 
 </resources>

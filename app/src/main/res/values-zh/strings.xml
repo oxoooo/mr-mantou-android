@@ -36,5 +36,6 @@
     <string name="save_success">照片已保存到: %s</string>
 
     <string name="set_wallpaper">设为壁纸</string>
+    <string name="set_wallpaper_success">壁纸设置成功</string>
 
 </resources>
