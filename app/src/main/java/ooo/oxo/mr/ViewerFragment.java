@@ -85,6 +85,10 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
         return RxFiles.mkdirsIfNotExists(new File(Environment.getExternalStorageDirectory(), name));
     }
 
+    private static String makeFileName(Image image) {
+        return String.format("%d.%s", image.createdAt.getTime(), image.meta.type);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,14 +103,10 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
         observableDownload = RxGlide.download(Glide.with(this), image.url);
 
-        observableSave = Observable
-                .combineLatest(
-                        observableDownload,
-                        ensureExternalDirectory("Mr.Mantou"),
-                        (Func2<File, File, Pair<File, File>>) Pair::new)
-                .flatMap(pair -> RxFiles.copy(pair.first,
-                        new File(pair.second, String.format("%d.%s",
-                                image.createdAt.getTime(), image.meta.type))));
+        observableSave = ensureExternalDirectory("Mr.Mantou")
+                .map(directory -> new File(directory, makeFileName(image)))
+                .withLatestFrom(observableDownload, (Func2<File, File, Pair<File, File>>) Pair::new)
+                .flatMap(pair -> RxFiles.copy(pair.second, pair.first));
     }
 
     @Nullable
