@@ -27,4 +27,12 @@
         app:showAsAction="always"
         tools:ignore="PrivateResource" />
 
+    <item
+        android:id="@+id/save"
+        android:title="@string/save" />
+
+    <item
+        android:id="@+id/set_wallpaper"
+        android:title="@string/set_wallpaper" />
+
 </menu>

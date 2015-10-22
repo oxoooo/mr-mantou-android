@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.SharedElementCallback;
+import android.support.v4.view.ViewPager;
 import android.transition.Transition;
 import android.view.View;
 
@@ -121,6 +122,14 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
 
         binding.pager.setAdapter(adapter);
         binding.pager.setCurrentItem(getIntent().getIntExtra("index", 0));
+        binding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager.SCROLL_STATE_DRAGGING) {
+                    fadeOut();
+                }
+            }
+        });
 
         images.addOnListChangedCallback(listener);
 

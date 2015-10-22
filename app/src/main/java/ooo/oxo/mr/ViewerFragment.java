@@ -21,19 +21,24 @@ package ooo.oxo.mr;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.WallpaperManager;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -70,6 +75,9 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
     private View sharedElement;
 
+    private Observable<File> observableDownload;
+    private Observable<File> observableSave;
+
     public ViewerFragment() {
     }
 
@@ -83,6 +91,29 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
                 !TextUtils.isEmpty(thumbnail);
 
         setHasOptionsMenu(true);
+
+        observableDownload = Observable.just(Glide.with(this).load(image.url))
+                .map(request -> {
+                    try {
+                        return request.downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        Log.e(TAG, "Failed to download photo", e);
+                        return null;
+                    }
+                })
+                .filter(file -> file != null);
+
+        observableSave = observableDownload
+                .map(src -> {
+                    try {
+                        return copy(src, makeExternalFile(String.format("%d.%s",
+                                image.createdAt.getTime(), image.meta.type)));
+                    } catch (IOException e) {
+                        Log.e(TAG, "Failed to save photo", e);
+                        return null;
+                    }
+                })
+                .filter(file -> file != null);
     }
 
     @Nullable
@@ -125,6 +156,12 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
         switch (item.getItemId()) {
             case R.id.share:
                 share();
+                return true;
+            case R.id.save:
+                save();
+                return true;
+            case R.id.set_wallpaper:
+                setWallpaper();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -195,34 +232,46 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
         }).start();
     }
 
-    private void share() {
-        Observable.just(Glide.with(this).load(image.url))
-                .map(request -> {
-                    try {
-                        return request.downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        return null;
-                    }
-                })
-                .filter(file -> file != null)
-                .map(src -> {
-                    // SB Chinese SNS apps, including Weibo, Wechat and QQ, don't read "content://"
-                    // uris, so we have to copy it to the external storage to generate a "file://"
-                    // uri.
-                    try {
-                        return copy(src, makeExternalFile(src.getName() + "." + image.meta.type));
-                    } catch (IOException e) {
-                        return null;
-                    }
-                })
-                .compose(bindToLifecycle())
+    private void save() {
+        observableSave
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
                 .subscribe(file -> {
+                    notifyMediaScanning(file);
+                    Toast.makeText(
+                            getContext(),
+                            getString(R.string.save_success, file.getPath()),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void share() {
+        observableSave
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(file -> {
+                    notifyMediaScanning(file);
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("image/" + image.meta.type);
                     intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
                     startActivity(Intent.createChooser(intent, getString(R.string.share_title)));
+                });
+    }
+
+    private void setWallpaper() {
+        observableDownload
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .compose(bindToLifecycle())
+                .subscribe(file -> {
+                    try {
+                        WallpaperManager.getInstance(getContext())
+                                .setStream(new FileInputStream(file));
+                    } catch (IOException e) {
+                        Log.e(TAG, "Failed to set wallpaper", e);
+                    }
                 });
     }
 
@@ -242,7 +291,16 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
     }
 
     private File makeExternalFile(String name) throws IOException {
-        return new File(getContext().getExternalCacheDir(), name);
+        File directory = new File(Environment.getExternalStorageDirectory(), "Mr.Mantou");
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new IOException("Failed to create external directory");
+        }
+
+        return new File(directory, name);
+    }
+
+    private void notifyMediaScanning(File file) {
+        MediaScannerConnection.scanFile(getContext(), new String[]{file.getPath()}, null, null);
     }
 
 }
