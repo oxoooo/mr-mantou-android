@@ -19,15 +19,7 @@
 <resources>
 
     <string name="app_name">Mr.Mantou</string>
-
-    <string name="about">About</string>
-    <string name="version" formatted="false">Version %s (%s)</string>
-    <string name="fork_me_on_github">Fork me on GitHub</string>
-    <string name="libraries_used">Libraries used</string>
-
-    <string name="update_available">New version %s is available</string>
-    <string name="update_confirm">Download Now</string>
-    <string name="update_cancel">Cancel</string>
+    <string name="app_name_debug">馒头先生 (debug)</string>
 
     <string name="share">Share</string>
     <string name="share_title">Share this photo to…</string>
@@ -37,5 +29,113 @@
 
     <string name="set_wallpaper">Set as wallpaper</string>
     <string name="set_wallpaper_success">Wallpaper is set</string>
+
+    <string name="permission_required">Write permission is required for saving photo.</string>
+
+    <string name="update_available">New version %s is available</string>
+    <string name="update_details">Details</string>
+    <string name="update_confirm">Download Now</string>
+    <string name="update_cancel">Cancel</string>
+
+    <string name="about">About</string>
+    <string name="version" formatted="false">Version %s (%s)</string>
+    <string name="fork_me_on_github">Fork me on GitHub</string>
+    <string name="support_us">Support us</string>
+    <string name="support_us_text"><![CDATA[
+        <p>Images are hosted on and accelerated by Qiniu CDN, using WebP compression to reduce nearly 90% data usage.</p>
+        <p>Donate to support our operating and development: Alipay <a href="copy:donate@oxo.ooo">donate@oxo.ooo</a></p>
+        <p>Keep in touch with us by following our account &quot;<a href="copy:馒头社">馒头社</a>&quot; on Wechat.</p>
+    ]]>
+    </string>
+    <string name="images_from">Images partially from</string>
+    <string name="libraries_used">Libraries used</string>
+
+    <string name="about_copied">\"%s\" is copied to your clipboard</string>
+
+    <string name="about_page" translatable="false"><![CDATA[
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+            html {
+                background: #F4F4F4;
+                height: 100%;
+            }
+
+            body {
+                padding: 16px 0;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            h2 {
+                font-size: 12px;
+                padding: 16px;
+                color: #999;
+            }
+
+            ul {
+                list-style: none;
+            }
+
+            li a,
+            li a:visited,
+            .card {
+                display: block;
+                background: #FFFFFF;
+                box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.20);
+                padding: 16px;
+                color: #555;
+                font-size: 16px;
+                text-decoration: none;
+            }
+
+            li a:hover,
+            li a:active {
+                text-decoration: none;
+                background: #FEFEFE;
+            }
+
+            .card {
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .card p:not(:last-child) {
+                margin-bottom: 16px;
+            }
+
+            .card a {
+                color: #FF5252;
+            }
+            </style>
+        </head>
+        <body>
+            <h2>{{fork_me_on_github}}</h2>
+            <ul>
+                <li><a href="https://github.com/oxoooo/mr-mantou-android">oxoooo / mr-mantou-android</a></li>
+            </ul>
+            <h2>{{support_us}}</h2>
+            <div class="card">{{support_us_text}}</div>
+            <h2>{{images_from}}</h2>
+            <ul>
+                <li><a href="http://gank.io">干货集中营</a></li>
+            </ul>
+            <h2>{{libraries_used}}</h2>
+            <ul>
+                <li><a href="https://github.com/ReactiveX/RxJava">ReactiveX / RxJava</a></li>
+                <li><a href="https://github.com/ReactiveX/RxAndroid">ReactiveX / RxAndroid</a></li>
+                <li><a href="https://github.com/trello/RxLifecycle">trello / RxLifecycle</a></li>
+                <li><a href="https://github.com/JakeWharton/RxBinding">JakeWharton / RxBinding</a></li>
+                <li><a href="https://github.com/tbruyelle/RxPermissions">tbruyelle / RxPermissions</a></li>
+                <li><a href="https://github.com/bumptech/glide">bumptech / glide</a></li>
+            </ul>
+        </body>
+    </html>
+    ]]></string>
 
 </resources>

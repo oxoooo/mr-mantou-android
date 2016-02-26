@@ -16,18 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ooo.oxo.mr.rx;
+package ooo.oxo.mr.net;
 
-import android.support.v4.widget.SwipeRefreshLayout;
+import com.avos.avoscloud.AVFile;
+import com.avos.avoscloud.AVOSCloud;
 
-import rx.Observable;
+import java.util.Locale;
 
-public class RxNetworking {
+public class QiniuUtil {
 
-    public static <T> Observable.Transformer<T, T> bindRefreshing(SwipeRefreshLayout indicator) {
-        return observable -> observable
-                .doOnSubscribe(() -> indicator.post(() -> indicator.setRefreshing(true)))
-                .doOnCompleted(() -> indicator.post(() -> indicator.setRefreshing(false)));
+    public static String getUrl(String url, int width) {
+        return String.format(Locale.US, "%s?imageView2/2/w/%d/format/webp", url, width);
+    }
+
+    public static String getUrl(AVFile file, int width) {
+        if (AVOSCloud.getStorageType() == AVOSCloud.StorageType.StorageTypeQiniu) {
+            return getUrl(file.getUrl(), width);
+        } else {
+            return file.getUrl();
+        }
     }
 
 }

@@ -16,21 +16,10 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<paths>
 
-    <item
-        android:id="@+id/share"
-        android:icon="@drawable/abc_ic_menu_share_material"
-        android:title="@string/share"
-        app:showAsAction="always" />
+    <cache-path
+        name="images"
+        path="image_manager_disk_cache" />
 
-    <item
-        android:id="@+id/save"
-        android:title="@string/save" />
-
-    <item
-        android:id="@+id/set_wallpaper"
-        android:title="@string/set_wallpaper" />
-
-</menu>
+</paths>

@@ -1,146 +1,86 @@
-/*
- * Mr.Mantou - On the importance of taste
- * Copyright (C) 2015  XiNGRZ <xxx@oxo.ooo>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package ooo.oxo.mr.model;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
-import java.text.SimpleDateFormat;
+import com.avos.avoscloud.AVClassName;
+import com.avos.avoscloud.AVFile;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+
 import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
-public class Image implements Parcelable {
+import ooo.oxo.mr.net.QiniuUtil;
 
-    public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+@AVClassName("Image")
+public class Image extends AVObject {
 
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.US);
+    public static final Creator CREATOR = AVObjectCreator.instance;
 
-    public static final Creator<Image> CREATOR = new Creator<Image>() {
-        @Override
-        public Image createFromParcel(Parcel in) {
-            return new Image(in);
-        }
+    private static final String PUBLISHED_AT = "publishedAt";
 
-        @Override
-        public Image[] newArray(int size) {
-            return new Image[size];
-        }
-    };
+    private static final String FILE = "file";
 
-    public String id;
+    private static final String META = "meta";
 
-    public Date createdAt;
-
-    public String url;
-
-    public String channel;
-
-    public Meta meta;
+    private static final String META_TYPE = "type";
+    private static final String META_WIDTH = "width";
+    private static final String META_HEIGHT = "height";
 
     public Image() {
+        super();
     }
 
-    protected Image(Parcel in) {
-        id = in.readString();
-        url = in.readString();
-        channel = in.readString();
+    public Image(Parcel in) {
+        super(in);
     }
 
-    public String getUTCCreatedAt() {
-        return DATE_FORMAT.format(createdAt);
+    public static AVQuery<Image> all() {
+        return AVObject.getQuery(Image.class)
+                .orderByDescending(PUBLISHED_AT);
     }
 
-    @Override
-    public String toString() {
-        return String.format("Image#%s[createdAt: %s, url: %s, channel: %s, meta: %s]",
-                id, getUTCCreatedAt(), url, channel, meta);
+    public static AVQuery<Image> since(Image image) {
+        return AVObject.getQuery(Image.class)
+                .whereGreaterThan(PUBLISHED_AT, image.getPublishedAt())
+                .orderByDescending(PUBLISHED_AT);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return (o == this) || (o instanceof Image && id.equals(((Image) o).id));
+    public Date getPublishedAt() {
+        return getDate(PUBLISHED_AT);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public AVFile getFile() {
+        return getAVFile(FILE);
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(url);
-        dest.writeString(channel);
+    public String getUrl() {
+        return getFile().getUrl();
     }
 
-    public static class Meta implements Parcelable {
+    public String getUrl(int width) {
+        return QiniuUtil.getUrl(getFile(), width);
+    }
 
-        public static final Creator<Meta> CREATOR = new Creator<Meta>() {
-            @Override
-            public Meta createFromParcel(Parcel in) {
-                return new Meta(in);
-            }
+    public String getMime() {
+        return getString("mime");
+    }
 
-            @Override
-            public Meta[] newArray(int size) {
-                return new Meta[size];
-            }
-        };
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getMeta() {
+        return getMap(META);
+    }
 
-        public String type;
+    public String getType() {
+        return (String) getMeta().get(META_TYPE);
+    }
 
-        public int width;
+    public int getWidth() {
+        return (Integer) getMeta().get(META_WIDTH);
+    }
 
-        public int height;
-
-        public List<Color> colors;
-
-        public Meta() {
-        }
-
-        protected Meta(Parcel in) {
-            type = in.readString();
-            width = in.readInt();
-            height = in.readInt();
-            colors = in.createTypedArrayList(Color.CREATOR);
-        }
-
-        @Override
-        public String toString() {
-            return String.format("Meta[type: %s, width: %d, height: %d, colors: %s]",
-                    type, width, height, colors.toString());
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(type);
-            dest.writeInt(width);
-            dest.writeInt(height);
-            dest.writeTypedList(colors);
-        }
-
+    public int getHeight() {
+        return (Integer) getMeta().get(META_HEIGHT);
     }
 
 }

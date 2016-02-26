@@ -16,25 +16,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-
-        <variable
-            name="name"
-            type="int" />
-
-    </data>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="@{name}"
-        tools:text="@string/fork_me_on_github" />
-
-</layout>
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="100"
+    android:fromAlpha="0.0"
+    android:toAlpha="1.0" />

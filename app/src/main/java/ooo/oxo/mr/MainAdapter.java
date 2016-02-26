@@ -51,14 +51,15 @@ public class MainAdapter extends BindingRecyclerView.ListAdapter<Image, MainAdap
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Image image = data.get(position);
+        final Image image = data.get(position);
+
         holder.binding.setImage(image);
 
         // execute the binding immediately to ensure the original size of RatioImageView is set
         // before layout
         holder.binding.executePendingBindings();
 
-        requestManager.load(image)
+        requestManager.load(image.getFile())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.binding.image);
     }
@@ -66,12 +67,12 @@ public class MainAdapter extends BindingRecyclerView.ListAdapter<Image, MainAdap
     @Override
     public int getItemViewType(int position) {
         Image image = data.get(position);
-        return Math.round((float) image.meta.width / (float) image.meta.height * 10f);
+        return Math.round((float) image.getWidth() / (float) image.getHeight() * 10f);
     }
 
     @Override
     public long getItemId(int position) {
-        return data.get(position).id.hashCode();
+        return data.get(position).getObjectId().hashCode();
     }
 
     public interface Listener {

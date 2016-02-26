@@ -25,7 +25,7 @@ import ooo.oxo.mr.widget.RatioImageView;
 @SuppressWarnings("unused")
 public class RatioImageViewBindingUtil {
 
-    @BindingAdapter({"bind:originalWidth", "bind:originalHeight"})
+    @BindingAdapter({"originalWidth", "originalHeight"})
     public static void setOriginalSize(RatioImageView view, int originalWidth, int originalHeight) {
         view.setOriginalSize(originalWidth, originalHeight);
     }

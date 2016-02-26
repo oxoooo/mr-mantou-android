@@ -18,24 +18,13 @@
 
 package ooo.oxo.mr;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.transition.Transition;
-import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -44,23 +33,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.target.Target;
 
-import java.io.File;
-
 import ooo.oxo.mr.databinding.ViewerFragmentBinding;
 import ooo.oxo.mr.model.Image;
 import ooo.oxo.mr.net.GlideRequestListenerAdapter;
-import ooo.oxo.mr.rx.RxFileInputStream;
-import ooo.oxo.mr.rx.RxFiles;
-import ooo.oxo.mr.rx.RxGlide;
-import ooo.oxo.mr.rx.RxWallpaperManager;
 import ooo.oxo.mr.util.EnterTransitionCompat;
 import ooo.oxo.mr.util.SimpleTransitionListener;
-import ooo.oxo.mr.util.ToastUtil;
 import ooo.oxo.mr.widget.RxBindingFragment;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func2;
-import rx.schedulers.Schedulers;
 
 public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
@@ -75,18 +53,7 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
     private View sharedElement;
 
-    private Observable<File> observableDownload;
-    private Observable<File> observableSave;
-
     public ViewerFragment() {
-    }
-
-    private static Observable<File> ensureExternalDirectory(String name) {
-        return RxFiles.mkdirsIfNotExists(new File(Environment.getExternalStorageDirectory(), name));
-    }
-
-    private static String makeFileName(Image image) {
-        return String.format("%d.%s", image.createdAt.getTime(), image.meta.type);
     }
 
     @Override
@@ -98,15 +65,6 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
 
         hasSharedElementTransition = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
                 !TextUtils.isEmpty(thumbnail);
-
-        setHasOptionsMenu(true);
-
-        observableDownload = RxGlide.download(Glide.with(this), image.url);
-
-        observableSave = ensureExternalDirectory("Mr.Mantou")
-                .map(directory -> new File(directory, makeFileName(image)))
-                .withLatestFrom(observableDownload, (Func2<File, File, Pair<File, File>>) Pair::new)
-                .flatMap(pair -> RxFiles.copy(pair.second, pair.first));
     }
 
     @Nullable
@@ -137,28 +95,6 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
     public void onSaveInstanceState(Bundle outState) {
         outState.putBoolean("transition_executed", isTransitionExecuted);
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.viewer, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.share:
-                share();
-                return true;
-            case R.id.save:
-                save();
-                return true;
-            case R.id.set_wallpaper:
-                setWallpaper();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     View getSharedElement() {
@@ -202,7 +138,7 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
     }
 
     private void loadFullImage() {
-        Glide.with(this).load(image.url)
+        Glide.with(this).load(image.getUrl())
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .crossFade(0)
                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
@@ -217,61 +153,7 @@ public class ViewerFragment extends RxBindingFragment<ViewerFragmentBinding> {
     }
 
     private void fadeInFullImage() {
-        binding.image.animate().alpha(1).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                binding.thumbnail.setVisibility(View.GONE);
-            }
-        }).start();
-    }
-
-    private void save() {
-        observableSave
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
-                .subscribe(file -> {
-                    notifyMediaScanning(file);
-                    ToastUtil.shorts(getContext(), R.string.save_success, file.getPath());
-                }, e -> {
-                    Log.e(TAG, "Failed to save picture", e);
-                });
-    }
-
-    private void share() {
-        observableSave
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
-                .subscribe(file -> {
-                    notifyMediaScanning(file);
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setType("image/" + image.meta.type);
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-                    startActivity(Intent.createChooser(intent, getString(R.string.share_title)));
-                }, e -> {
-                    Log.e(TAG, "Failed to save picture", e);
-                });
-    }
-
-    private void setWallpaper() {
-        observableDownload
-                .flatMap(RxFileInputStream::create)
-                .flatMap(stream -> RxWallpaperManager.setStream(getContext(), stream))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
-                .subscribe(avoid -> {
-                    ToastUtil.shorts(getContext(), R.string.set_wallpaper_success);
-                }, e -> {
-                    Log.e(TAG, "Failed to save picture", e);
-                });
-    }
-
-    private void notifyMediaScanning(File file) {
-        MediaScannerConnection.scanFile(
-                getContext().getApplicationContext(),
-                new String[]{file.getPath()}, null, null);
+        binding.fade.setDisplayedChild(1);
     }
 
 }

@@ -20,6 +20,7 @@ package ooo.oxo.mr.net;
 
 import android.content.Context;
 
+import com.avos.avoscloud.AVFile;
 import com.bumptech.glide.load.model.GenericLoaderFactory;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.ModelLoader;
@@ -28,28 +29,22 @@ import com.bumptech.glide.load.model.stream.BaseGlideUrlLoader;
 
 import java.io.InputStream;
 
-import ooo.oxo.mr.model.Image;
+public class AVFileLoader extends BaseGlideUrlLoader<AVFile> {
 
-public class ResizedImageLoader extends BaseGlideUrlLoader<Image> {
-
-    private static final String TAG = "ImageCandidatesLoader";
-
-    public ResizedImageLoader(ModelLoader<GlideUrl, InputStream> concreteLoader) {
+    public AVFileLoader(ModelLoader<GlideUrl, InputStream> concreteLoader) {
         super(concreteLoader);
     }
 
     @Override
-    protected String getUrl(Image model, int width, int height) {
-        return QiniuImageQueryBuilder.build(model.url, width);
+    protected String getUrl(AVFile model, int width, int height) {
+        return QiniuUtil.getUrl(model, width);
     }
 
-    public static class Factory implements ModelLoaderFactory<Image, InputStream> {
+    public static class Factory implements ModelLoaderFactory<AVFile, InputStream> {
 
         @Override
-        public ModelLoader<Image, InputStream> build(
-                Context context, GenericLoaderFactory factories) {
-            return new ResizedImageLoader(
-                    factories.buildModelLoader(GlideUrl.class, InputStream.class));
+        public ModelLoader<AVFile, InputStream> build(Context context, GenericLoaderFactory factories) {
+            return new AVFileLoader(factories.buildModelLoader(GlideUrl.class, InputStream.class));
         }
 
         @Override

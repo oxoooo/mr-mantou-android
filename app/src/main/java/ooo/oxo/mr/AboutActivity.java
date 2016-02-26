@@ -18,24 +18,22 @@
 
 package ooo.oxo.mr;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.util.ArrayMap;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Toast;
 
-import ooo.oxo.library.databinding.support.widget.BindingRecyclerView;
 import ooo.oxo.mr.databinding.AboutActivityBinding;
-import ooo.oxo.mr.databinding.AboutHeaderBinding;
-import ooo.oxo.mr.databinding.AboutLibraryItemBinding;
 
 public class AboutActivity extends AppCompatActivity {
 
-    private final ArrayMap<String, String> libraries = new ArrayMap<>();
+    private ClipboardManager cm;
 
     @Override
     @SuppressWarnings("SpellCheckingInspection")
@@ -46,86 +44,46 @@ public class AboutActivity extends AppCompatActivity {
 
         binding.toolbar.setNavigationOnClickListener(v -> supportFinishAfterTransition());
 
-        libraries.put("square / okhttp", "https://square.github.io/okhttp/");
-        libraries.put("square / retrofit", "https://square.github.io/retrofit/");
-        libraries.put("google / gson", "https://github.com/google/gson");
-        libraries.put("bumptech / glide", "https://github.com/bumptech/glide");
-        libraries.put("sephiroth74 / ImageViewZoom", "https://github.com/sephiroth74/ImageViewZoom");
-        libraries.put("ReactiveX / RxJava", "https://github.com/ReactiveX/RxJava");
-        libraries.put("ReactiveX / RxAndroid", "https://github.com/ReactiveX/RxAndroid");
-        libraries.put("JakeWharton / RxBinding", "https://github.com/JakeWharton/RxBinding");
-        libraries.put("trello / RxLifecycle", "https://github.com/trello/RxLifecycle");
+        final String template = getString(R.string.about_page)
+                .replace("{{fork_me_on_github}}", getString(R.string.fork_me_on_github))
+                .replace("{{images_from}}", getString(R.string.images_from))
+                .replace("{{support_us}}", getString(R.string.support_us))
+                .replace("{{support_us_text}}", getString(R.string.support_us_text))
+                .replace("{{libraries_used}}", getString(R.string.libraries_used));
 
-        binding.libraries.setAdapter(new LibrariesAdapter());
+        binding.chrome.setWebViewClient(new AboutClient());
+        binding.chrome.loadData(template, "text/html; charset=utf-8", null);
+
+        cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
     }
 
-    private void open(String url) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+    private void copy(String text) {
+        cm.setPrimaryClip(ClipData.newPlainText(text, text));
+        Toast.makeText(this, getString(R.string.about_copied, text), Toast.LENGTH_SHORT).show();
     }
 
-    class LibrariesAdapter extends RecyclerView.Adapter<BindingRecyclerView.ViewHolder> {
+    private void open(Uri uri) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        private final LayoutInflater inflater = getLayoutInflater();
-
-        @Override
-        public BindingRecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return viewType == 0
-                    ? new HeaderViewHolder(AboutHeaderBinding.inflate(inflater, parent, false))
-                    : new ItemViewHolder(AboutLibraryItemBinding.inflate(inflater, parent, false));
+        try {
+            startActivity(intent);
+        } catch (Exception ignored) {
         }
+    }
+
+    private class AboutClient extends WebViewClient {
 
         @Override
-        public void onBindViewHolder(BindingRecyclerView.ViewHolder holder, int position) {
-            if (holder.getItemViewType() == 0) {
-                ((HeaderViewHolder) holder).binding.setName(position == 0
-                        ? R.string.fork_me_on_github
-                        : R.string.libraries_used);
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            final Uri uri = Uri.parse(url);
+            if ("copy".equals(uri.getScheme())) {
+                copy(uri.getSchemeSpecificPart());
+                return true;
             } else {
-                ItemViewHolder itemHolder = (ItemViewHolder) holder;
-                if (position == 1) {
-                    itemHolder.binding.setName("oxoooo / mr-mantou-android");
-                } else {
-                    itemHolder.binding.setName(libraries.keyAt(position - 3));
-                }
+                open(uri);
+                return true;
             }
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            return position == 0 || position == 2 ? 0 : 1;
-        }
-
-        @Override
-        public int getItemCount() {
-            return libraries.size() + 3;
-        }
-
-        private void handleItemClick(int position) {
-            if (position == 1) {
-                open("https://github.com/oxoooo/mr-mantou-android");
-            } else {
-                open(libraries.valueAt(position - 3));
-            }
-        }
-
-        class HeaderViewHolder extends BindingRecyclerView.ViewHolder<AboutHeaderBinding> {
-
-            public HeaderViewHolder(AboutHeaderBinding binding) {
-                super(binding);
-            }
-
-        }
-
-        class ItemViewHolder extends BindingRecyclerView.ViewHolder<AboutLibraryItemBinding> {
-
-            public ItemViewHolder(AboutLibraryItemBinding binding) {
-                super(binding);
-                itemView.setOnClickListener(v -> handleItemClick(getAdapterPosition()));
-            }
-
         }
 
     }

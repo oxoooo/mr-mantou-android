@@ -27,23 +27,24 @@
 
     </data>
 
-    <FrameLayout
+    <ViewSwitcher
+        android:id="@+id/fade"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:inAnimation="@anim/fade_in">
 
         <ImageView
             android:id="@+id/thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:transitionName="@{image.id + `.image`}"
+            android:transitionName="@{image.objectId + `.image`}"
             tools:ignore="ContentDescription,UnusedAttribute" />
 
         <ooo.oxo.library.widget.TouchImageView
             android:id="@+id/image"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha="0" />
+            android:layout_height="match_parent" />
 
-    </FrameLayout>
+    </ViewSwitcher>
 
 </layout>

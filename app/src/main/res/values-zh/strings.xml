@@ -20,15 +20,6 @@
 
     <string name="app_name">馒头先生</string>
 
-    <string name="about">关于</string>
-    <string name="version" formatted="false">版本 %s (%s)</string>
-    <string name="fork_me_on_github">访问项目在 GitHub 上的源代码</string>
-    <string name="libraries_used">本项目用到了下列开源库</string>
-
-    <string name="update_available">有新版本 %s 了</string>
-    <string name="update_confirm">现在下载</string>
-    <string name="update_cancel">取消</string>
-
     <string name="share">分享</string>
     <string name="share_title">将这张照片分享到…</string>
 
@@ -37,5 +28,22 @@
 
     <string name="set_wallpaper">设为壁纸</string>
     <string name="set_wallpaper_success">壁纸设置成功</string>
+
+    <string name="permission_required">保存照片需要有写入权限</string>
+
+    <string name="about">关于</string>
+    <string name="version" formatted="false">版本 %s (%s)</string>
+    <string name="fork_me_on_github">访问项目在 GitHub 上的源代码</string>
+    <string name="support_us">支持我们</string>
+    <string name="support_us_text"><![CDATA[
+        <p>所有图片存放于并使用七牛 CDN 加速，使用 WebP 压缩以节省近 90% 的流量消耗。</p>
+        <p>如果您喜欢，请捐赠我们继续运作和开发：支付宝 <a href="copy:donate@oxo.ooo">donate@oxo.ooo</a></p>
+        <p>了解更多最新消息请关注我们的微信公众号「<a href="copy:馒头社">馒头社</a>」</p>
+    ]]>
+    </string>
+    <string name="images_from">部分图片来自</string>
+    <string name="libraries_used">本项目用到了下列开源库</string>
+
+    <string name="about_copied">「%s」已复制到您的剪贴板</string>
 
 </resources>

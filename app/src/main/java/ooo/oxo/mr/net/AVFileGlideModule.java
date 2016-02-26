@@ -18,10 +18,24 @@
 
 package ooo.oxo.mr.net;
 
-public class QiniuImageQueryBuilder {
+import android.content.Context;
 
-    public static String build(String url, int width) {
-        return String.format("%s?imageView2/2/w/%d/format/webp", url, width);
+import com.avos.avoscloud.AVFile;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
+import com.bumptech.glide.module.GlideModule;
+
+import java.io.InputStream;
+
+public class AVFileGlideModule implements GlideModule {
+
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+    }
+
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+        glide.register(AVFile.class, InputStream.class, new AVFileLoader.Factory());
     }
 
 }
