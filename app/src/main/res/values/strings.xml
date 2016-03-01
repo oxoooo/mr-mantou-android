@@ -19,7 +19,7 @@
 <resources>
 
     <string name="app_name">Mr.Mantou</string>
-    <string name="app_name_debug">馒头先生 (debug)</string>
+    <string name="app_name_debug" translatable="false">馒头先生 (debug)</string>
 
     <string name="share">Share</string>
     <string name="share_title">Share this photo to…</string>
@@ -33,7 +33,6 @@
     <string name="permission_required">Write permission is required for saving photo.</string>
 
     <string name="update_available">New version %s is available</string>
-    <string name="update_details">Details</string>
     <string name="update_confirm">Download Now</string>
     <string name="update_cancel">Cancel</string>
 

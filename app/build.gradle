@@ -136,6 +136,9 @@ dependencies {
     compile 'com.github.oxoooo:touch-image-view:1.0.1'
     compile 'com.github.oxoooo:data-binding-support:1.1.0'
 
+    // required by fir
+    compile 'com.squareup.okhttp:okhttp:2.7.2'
+
     compile 'com.umeng.analytics:analytics:latest.integration'
     compile 'im.fir:sdk:latest.integration@aar'
 }

@@ -45,6 +45,7 @@ import ooo.oxo.mr.databinding.MainActivityBinding;
 import ooo.oxo.mr.model.Image;
 import ooo.oxo.mr.rx.RxAVQuery;
 import ooo.oxo.mr.rx.RxList;
+import ooo.oxo.mr.util.UpdateUtil;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -111,6 +112,8 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
                 .doOnNext(avoid -> binding.content.smoothScrollToPosition(0))
                 .retry()
                 .subscribe(RxList.prependTo(images));
+
+        UpdateUtil.checkForUpdate(version -> UpdateUtil.promptUpdate(this, version));
     }
 
     @Override

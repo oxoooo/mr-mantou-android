@@ -31,6 +31,10 @@
 
     <string name="permission_required">保存照片需要有写入权限</string>
 
+    <string name="update_available">有新版本 %s 了</string>
+    <string name="update_confirm">现在下载</string>
+    <string name="update_cancel">取消</string>
+
     <string name="about">关于</string>
     <string name="version" formatted="false">版本 %s (%s)</string>
     <string name="fork_me_on_github">访问项目在 GitHub 上的源代码</string>
