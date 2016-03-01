@@ -181,6 +181,7 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
                 .compose(bindToLifecycle())
                 .compose(ensurePermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE))
                 .map(avoid -> getCurrentImage())
+                .doOnNext(image -> MobclickAgent.onEvent(this, "share", image.getObjectId()))
                 .observeOn(Schedulers.io())
                 .flatMap(this::saveIfNeeded)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -198,6 +199,7 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
                 .compose(bindToLifecycle())
                 .compose(ensurePermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE))
                 .map(avoid -> getCurrentImage())
+                .doOnNext(image -> MobclickAgent.onEvent(this, "save", image.getObjectId()))
                 .observeOn(Schedulers.io())
                 .flatMap(this::saveIfNeeded)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -207,17 +209,19 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
                     ToastUtil.shorts(this, R.string.save_success, file.getPath());
                 });
 
+        final WallpaperManager wm = WallpaperManager.getInstance(this);
+
         menuItemClicks(R.id.set_wallpaper)
                 .compose(bindToLifecycle())
                 .map(avoid -> getCurrentImage())
+                .doOnNext(image -> MobclickAgent.onEvent(this, "set_wallpaper", image.getObjectId()))
                 .observeOn(Schedulers.io())
                 .flatMap(this::download)
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(file -> FileProvider.getUriForFile(this, AUTHORITY_IMAGES, file))
                 .retry()
                 .subscribe(uri -> {
-                    final Intent intent = WallpaperManager.getInstance(this)
-                            .getCropAndSetWallpaperIntent(uri);
+                    final Intent intent = wm.getCropAndSetWallpaperIntent(uri);
                     startActivity(intent);
                 });
     }
