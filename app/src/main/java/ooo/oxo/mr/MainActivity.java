@@ -21,6 +21,7 @@ package ooo.oxo.mr;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableArrayList;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.SharedElementCallback;
@@ -143,8 +144,15 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
         intent.putExtra("index", holder.getAdapterPosition());
         intent.putExtra("thumbnail", image.getUrl(holder.binding.image.getWidth()));
 
-        final ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this, holder.binding.image, String.format("%s.image", image.getObjectId()));
+        final ActivityOptionsCompat options;
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    this, holder.binding.image, String.format("%s.image", image.getObjectId()));
+        } else {
+            options = ActivityOptionsCompat.makeScaleUpAnimation(
+                    holder.itemView, 0, 0, holder.itemView.getWidth(), holder.itemView.getHeight());
+        }
 
         startActivity(intent, options.toBundle());
     }
