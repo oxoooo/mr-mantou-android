@@ -34,7 +34,7 @@ android {
 
         targetSdkVersion 23
 
-        versionCode 10000 + gitCommits
+        versionCode 10200 + gitCommits
         versionName gitTag
 
         addManifestPlaceholders APP_NAME: '@string/app_name'
