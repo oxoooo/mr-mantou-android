@@ -54,8 +54,6 @@ public class InsetsCoordinatorLayout extends CoordinatorLayout {
                 b.onApplyWindowInsets(this, child, WindowInsetsCompatUtil.copy(insets));
             }
 
-            requestLayout();
-
             return insets;
         });
     }
