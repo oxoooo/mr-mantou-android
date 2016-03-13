@@ -19,21 +19,31 @@
 package ooo.oxo.mr.widget;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+
+import ooo.oxo.mr.R;
 
 public class OhToolbar extends Toolbar {
 
     public OhToolbar(Context context) {
-        super(context);
+        this(context, null);
     }
 
-    public OhToolbar(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public OhToolbar(Context context, @Nullable AttributeSet attrs) {
+        this(context, attrs, R.attr.toolbarStyle);
     }
 
-    public OhToolbar(Context context, AttributeSet attrs, int defStyleAttr) {
+    public OhToolbar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        ViewCompat.setOnApplyWindowInsetsListener(this, (v, insets) -> {
+            final int l = getPaddingLeft(), r = getPaddingRight();
+            final int t = insets.getSystemWindowInsetTop();
+            setPadding(l, t, r, 0);
+            return insets.consumeSystemWindowInsets();
+        });
     }
 
     public void fadeIn() {

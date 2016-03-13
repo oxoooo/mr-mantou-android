@@ -25,11 +25,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            android:visibility="invisible" />
+            android:layout_height="wrap_content">
+
+            <ooo.oxo.mr.widget.OhToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
+                app:title="@string/app_name" />
+
+        </android.support.design.widget.AppBarLayout>
 
         <ooo.oxo.mr.widget.OhSwipeRefreshLayout
             android:id="@+id/refresher"
@@ -47,38 +56,11 @@
                 android:paddingLeft="2dp"
                 android:paddingRight="2dp"
                 android:paddingTop="2dp"
-                android:scrollbarStyle="outsideOverlay"
-                android:scrollbars="vertical"
                 app:layoutManager="StaggeredGridLayoutManager"
                 app:spanCount="2"
                 tools:padding="8dp" />
 
         </ooo.oxo.mr.widget.OhSwipeRefreshLayout>
-
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/app_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_scrollFlags="scroll|enterAlways|snap">
-
-                <ooo.oxo.mr.widget.StatusBarHolderView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:title="@string/app_name" />
-
-            </LinearLayout>
-
-        </android.support.design.widget.AppBarLayout>
 
     </android.support.design.widget.CoordinatorLayout>
 
