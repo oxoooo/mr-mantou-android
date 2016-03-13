@@ -62,6 +62,8 @@
 
         <activity
             android:name=".ViewerActivity"
+            android:launchMode="singleTask"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/ViewerTheme" />
 
         <activity
