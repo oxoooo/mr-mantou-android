@@ -56,7 +56,7 @@
                 android:orientation="vertical"
                 app:layoutManager="StaggeredGridLayoutManager"
                 app:padding="2dp"
-                app:spanCount="2"
+                app:spanCount="@integer/span_count"
                 tools:padding="8dp" />
 
         </ooo.oxo.mr.widget.OhSwipeRefreshLayout>
