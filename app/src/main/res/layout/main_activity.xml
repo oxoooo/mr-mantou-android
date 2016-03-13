@@ -21,9 +21,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-    <android.support.design.widget.CoordinatorLayout
+    <ooo.oxo.mr.widget.InsetsCoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar"
@@ -44,24 +45,22 @@
             android:id="@+id/refresher"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior="ooo.oxo.mr.widget.InsetsScrollingViewBehavior">
 
-            <android.support.v7.widget.RecyclerView
+            <ooo.oxo.mr.widget.OhRecyclerView
                 android:id="@+id/content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
+                android:fitsSystemWindows="true"
                 android:orientation="vertical"
-                android:paddingBottom="50dp"
-                android:paddingLeft="2dp"
-                android:paddingRight="2dp"
-                android:paddingTop="2dp"
                 app:layoutManager="StaggeredGridLayoutManager"
+                app:padding="2dp"
                 app:spanCount="2"
                 tools:padding="8dp" />
 
         </ooo.oxo.mr.widget.OhSwipeRefreshLayout>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </ooo.oxo.mr.widget.InsetsCoordinatorLayout>
 
 </layout>

@@ -10,7 +10,7 @@
 
 # support library
 -keep class android.support.v7.widget.StaggeredGridLayoutManager { *; }
--keep class android.support.design.widget.AppBarLayout$ScrollingViewBehavior { *; }
+-keep class ooo.oxo.mr.widget.InsetsScrollingViewBehavior { *; }
 
 # data binding
 -keep class ooo.oxo.mr.binding.**
