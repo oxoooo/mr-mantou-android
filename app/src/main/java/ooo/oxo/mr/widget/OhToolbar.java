@@ -39,8 +39,9 @@ public class OhToolbar extends Toolbar {
     public OhToolbar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         ViewCompat.setOnApplyWindowInsetsListener(this, (v, insets) -> {
-            final int l = getPaddingLeft(), r = getPaddingRight();
+            final int l = insets.getSystemWindowInsetLeft();
             final int t = insets.getSystemWindowInsetTop();
+            final int r = insets.getSystemWindowInsetRight();
             setPadding(l, t, r, 0);
             return insets.consumeSystemWindowInsets();
         });
