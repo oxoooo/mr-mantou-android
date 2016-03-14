@@ -39,6 +39,7 @@ import android.support.v4.app.SharedElementCallback;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.transition.Transition;
+import android.util.Log;
 import android.view.View;
 
 import com.bumptech.glide.Glide;
@@ -48,6 +49,7 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -57,15 +59,18 @@ import ooo.oxo.mr.databinding.ViewerActivityBinding;
 import ooo.oxo.mr.model.Image;
 import ooo.oxo.mr.rx.RxFiles;
 import ooo.oxo.mr.rx.RxGlide;
+import ooo.oxo.mr.util.ImmersiveUtil;
+import ooo.oxo.mr.util.InOutAnimationUtils;
 import ooo.oxo.mr.util.ObservableListPagerAdapterCallback;
 import ooo.oxo.mr.util.SimpleTransitionListener;
 import ooo.oxo.mr.util.ToastUtil;
-import ooo.oxo.mr.widget.ImmersiveUtil;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class ViewerActivity extends RxAppCompatActivity implements PullBackLayout.Callback {
+
+    private static final String TAG = "ViewerActivity";
 
     private static final String AUTHORITY_IMAGES = BuildConfig.APPLICATION_ID + ".images";
 
@@ -221,8 +226,17 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
                 .map(file -> FileProvider.getUriForFile(this, AUTHORITY_IMAGES, file))
                 .retry()
                 .subscribe(uri -> {
-                    final Intent intent = wm.getCropAndSetWallpaperIntent(uri);
-                    startActivity(intent);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                        startActivity(wm.getCropAndSetWallpaperIntent(uri));
+                    } else {
+                        try {
+                            wm.setStream(getContentResolver().openInputStream(uri));
+                            ToastUtil.shorts(this, R.string.set_wallpaper_success);
+                        } catch (IOException e) {
+                            Log.e(TAG, "Failed to set wallpaper", e);
+                            ToastUtil.shorts(this, e.getMessage(), e);
+                        }
+                    }
                 });
     }
 
@@ -249,35 +263,27 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
     }
 
     void fadeIn() {
-        binding.toolbar.fadeIn();
-        showSystemUi();
+        InOutAnimationUtils.animateIn(binding.toolbar, R.anim.viewer_toolbar_fade_in);
+        ImmersiveUtil.exit(this);
     }
 
     void fadeOut() {
-        binding.toolbar.fadeOut();
-        hideSystemUi();
+        InOutAnimationUtils.animateOut(binding.toolbar, R.anim.viewer_toolbar_fade_out);
+        ImmersiveUtil.enter(this);
     }
 
     void toggleFade() {
-        if (binding.toolbar.getAlpha() == 0) {
-            fadeIn();
-        } else {
+        if (binding.toolbar.getVisibility() == View.VISIBLE) {
             fadeOut();
+        } else {
+            fadeIn();
         }
-    }
-
-    private void showSystemUi() {
-        ImmersiveUtil.exit(binding.getRoot());
-    }
-
-    private void hideSystemUi() {
-        ImmersiveUtil.enter(binding.getRoot());
     }
 
     @Override
     public void onPullStart() {
-        fadeOut();
-        showSystemUi();
+        InOutAnimationUtils.animateOut(binding.toolbar, R.anim.viewer_toolbar_fade_out);
+        ImmersiveUtil.exit(this);
     }
 
     @Override
@@ -306,7 +312,7 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
         data.putExtra("index", binding.pager.getCurrentItem());
         setResult(RESULT_OK, data);
 
-        showSystemUi();
+        ImmersiveUtil.exit(this);
 
         super.supportFinishAfterTransition();
     }

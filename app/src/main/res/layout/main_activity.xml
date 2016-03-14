@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             tools:paddingTop="25dp">
 
-            <ooo.oxo.mr.widget.OhToolbar
+            <ooo.oxo.mr.widget.InsetsToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

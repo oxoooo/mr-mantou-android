@@ -26,17 +26,17 @@ import android.util.AttributeSet;
 
 import ooo.oxo.mr.R;
 
-public class OhToolbar extends Toolbar {
+public class InsetsToolbar extends Toolbar {
 
-    public OhToolbar(Context context) {
+    public InsetsToolbar(Context context) {
         this(context, null);
     }
 
-    public OhToolbar(Context context, @Nullable AttributeSet attrs) {
+    public InsetsToolbar(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, R.attr.toolbarStyle);
     }
 
-    public OhToolbar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public InsetsToolbar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         ViewCompat.setOnApplyWindowInsetsListener(this, (v, insets) -> {
             final int l = insets.getSystemWindowInsetLeft();
@@ -45,14 +45,6 @@ public class OhToolbar extends Toolbar {
             setPadding(l, t, r, 0);
             return insets.consumeSystemWindowInsets();
         });
-    }
-
-    public void fadeIn() {
-        animate().alpha(1).start();
-    }
-
-    public void fadeOut() {
-        animate().alpha(0).start();
     }
 
 }

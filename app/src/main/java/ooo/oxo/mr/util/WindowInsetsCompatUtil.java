@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ooo.oxo.mr.widget;
+package ooo.oxo.mr.util;
 
 import android.annotation.SuppressLint;
 import android.support.v4.view.WindowInsetsCompat;

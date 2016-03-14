@@ -37,17 +37,17 @@
 
         </ooo.oxo.library.widget.PullBackLayout>
 
-        <ooo.oxo.mr.widget.OhToolbar
+        <ooo.oxo.mr.widget.InsetsToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="0"
             android:background="@drawable/viewer_header"
             android:fitsSystemWindows="true"
             android:paddingBottom="24dp"
+            android:visibility="invisible"
             app:navigationIcon="?homeAsUpIndicator"
-            tools:alpha="1"
-            tools:paddingTop="25dp" />
+            tools:paddingTop="25dp"
+            tools:visibility="visible" />
 
     </FrameLayout>
 
