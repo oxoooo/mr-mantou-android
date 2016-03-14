@@ -29,7 +29,8 @@
         <android.support.design.widget.AppBarLayout
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            tools:paddingTop="25dp">
 
             <ooo.oxo.mr.widget.OhToolbar
                 android:id="@+id/toolbar"
