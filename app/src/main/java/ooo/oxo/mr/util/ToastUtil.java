@@ -28,12 +28,24 @@ public class ToastUtil {
         Toast.makeText(context, context.getString(resId, args), duration).show();
     }
 
+    public static void show(Context context, int duration, String text, Object... args) {
+        Toast.makeText(context, String.format(text, args), duration).show();
+    }
+
     public static void shorts(Context context, @StringRes int resId, Object... args) {
         show(context, Toast.LENGTH_SHORT, resId, args);
     }
 
+    public static void shorts(Context context, String text, Object... args) {
+        show(context, Toast.LENGTH_SHORT, text, args);
+    }
+
     public static void longs(Context context, @StringRes int resId, Object... args) {
         show(context, Toast.LENGTH_LONG, resId, args);
+    }
+
+    public static void longs(Context context, String text, Object... args) {
+        show(context, Toast.LENGTH_LONG, text, args);
     }
 
 }

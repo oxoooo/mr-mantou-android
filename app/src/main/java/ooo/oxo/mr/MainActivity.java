@@ -30,7 +30,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.MemoryCategory;
@@ -45,7 +44,9 @@ import ooo.oxo.mr.databinding.MainActivityBinding;
 import ooo.oxo.mr.model.Image;
 import ooo.oxo.mr.rx.RxAVQuery;
 import ooo.oxo.mr.rx.RxList;
+import ooo.oxo.mr.util.ToastUtil;
 import ooo.oxo.mr.util.UpdateUtil;
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -94,24 +95,35 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
             }
         });
 
-        RxAVQuery.find(Image.all())
-                .compose(bindToLifecycle())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        Observable<List<Image>> load = Observable.just(images)
                 .doOnSubscribe(() -> binding.refresher.setRefreshing(true))
                 .doOnCompleted(() -> binding.refresher.setRefreshing(false))
-                .subscribe(RxList.appendTo(images), this::showError);
+                .map(whatever -> images.isEmpty() ? Image.all() : Image.since(images.get(0)))
+                .observeOn(Schedulers.io())
+                .flatMap(RxAVQuery::find)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(RxList.prependTo(images));
 
         RxSwipeRefreshLayout.refreshes(binding.refresher)
                 .compose(bindToLifecycle())
-                .map(avoid -> images.get(0))
-                .observeOn(Schedulers.io())
-                .flatMap(latest -> RxAVQuery.find(Image.since(latest)))
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(avoid -> binding.refresher.setRefreshing(false))
-                .doOnNext(avoid -> binding.content.smoothScrollToPosition(0))
-                .retry()
-                .subscribe(RxList.prependTo(images));
+                .flatMap(whatever -> load)
+                .retry((count, tr) -> {
+                    Log.e(TAG, "An error occurred while fetching images", tr);
+                    ToastUtil.shorts(this, tr.getMessage());
+                    binding.refresher.setRefreshing(false);
+                    return true;
+                })
+                .filter(loaded -> !loaded.isEmpty())
+                .subscribe(loaded -> binding.content.smoothScrollToPosition(0));
+
+        load.compose(bindToLifecycle())
+                .onErrorReturn(tr -> {
+                    Log.e(TAG, "An error occurred while fetching images", tr);
+                    ToastUtil.shorts(this, tr.getMessage());
+                    binding.refresher.setRefreshing(false);
+                    return null;
+                })
+                .subscribe();
 
         UpdateUtil.checkForUpdate(version -> UpdateUtil.promptUpdate(this, version));
     }
@@ -132,11 +144,6 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
     protected void onPause() {
         super.onPause();
         MobclickAgent.onPause(this);
-    }
-
-    private void showError(Throwable error) {
-        Log.e(TAG, "error", error);
-        Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
