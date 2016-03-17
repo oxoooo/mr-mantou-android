@@ -19,6 +19,8 @@
 package ooo.oxo.mr.widget;
 
 import android.content.Context;
+import android.graphics.Rect;
+import android.os.Build;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -45,8 +47,7 @@ public class InsetsCoordinatorLayout extends CoordinatorLayout {
 
             for (int i = 0, count = getChildCount(); i < count; i++) {
                 final View child = getChildAt(i);
-                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
-                final Behavior b = lp.getBehavior();
+                final Behavior b = getBehavior(child);
 
                 if (b == null) {
                     continue;
@@ -58,6 +59,46 @@ public class InsetsCoordinatorLayout extends CoordinatorLayout {
 
             return insets;
         });
+    }
+
+    private static Behavior getBehavior(View child) {
+        final LayoutParams lp = (LayoutParams) child.getLayoutParams();
+        return lp.getBehavior();
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    protected boolean fitSystemWindows(Rect insets) {
+        if (Build.VERSION.SDK_INT >= 21) {
+            return super.fitSystemWindows(insets);
+        }
+
+        boolean consumed = false;
+
+        for (int i = 0, count = getChildCount(); i < count; i++) {
+            final View child = getChildAt(i);
+            final Behavior b = getBehavior(child);
+
+            if (b == null) {
+                continue;
+            }
+
+            if (!(b instanceof WindowInsetsHandlingBehavior)) {
+                continue;
+            }
+
+            if (((WindowInsetsHandlingBehavior) b).onApplyWindowInsets(this, child, insets)) {
+                consumed = true;
+            }
+        }
+
+        return consumed;
+    }
+
+    public interface WindowInsetsHandlingBehavior {
+
+        boolean onApplyWindowInsets(CoordinatorLayout layout, View child, Rect insets);
+
     }
 
 }

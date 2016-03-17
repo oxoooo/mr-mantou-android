@@ -20,37 +20,45 @@ package ooo.oxo.mr.widget;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.support.annotation.Keep;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.WindowInsetsCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
+import ooo.oxo.mr.view.WindowInsetsHandler;
 import ooo.oxo.mr.view.WindowInsetsHelper;
 
-@Keep
-@SuppressWarnings("unused")
-public class InsetsScrollingViewBehavior extends AppBarLayout.ScrollingViewBehavior
-        implements InsetsCoordinatorLayout.WindowInsetsHandlingBehavior {
+@CoordinatorLayout.DefaultBehavior(InsetsAppBarLayout.Behavior.class)
+public class InsetsAppBarLayout extends AppBarLayout implements WindowInsetsHandler {
 
-    public InsetsScrollingViewBehavior() {
+    public InsetsAppBarLayout(Context context) {
+        super(context);
     }
 
-    public InsetsScrollingViewBehavior(Context context, AttributeSet attrs) {
+    public InsetsAppBarLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
-    public WindowInsetsCompat onApplyWindowInsets(CoordinatorLayout layout, View child,
-                                                  WindowInsetsCompat insets) {
-        return ViewCompat.onApplyWindowInsets(child, insets);
+    public boolean onApplyWindowInsets(Rect insets) {
+        return WindowInsetsHelper.dispatchApplyWindowInsets(this, insets);
     }
 
-    @Override
-    public boolean onApplyWindowInsets(CoordinatorLayout layout, View child, Rect insets) {
-        return WindowInsetsHelper.onApplyWindowInsets(child, insets);
+    public static class Behavior extends AppBarLayout.Behavior
+            implements InsetsCoordinatorLayout.WindowInsetsHandlingBehavior {
+
+        public Behavior() {
+        }
+
+        public Behavior(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        @Override
+        public boolean onApplyWindowInsets(CoordinatorLayout layout, View child, Rect insets) {
+            return WindowInsetsHelper.onApplyWindowInsets(child, insets);
+        }
+
     }
 
 }

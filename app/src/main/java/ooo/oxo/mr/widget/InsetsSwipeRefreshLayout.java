@@ -20,39 +20,25 @@ package ooo.oxo.mr.widget;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 
-import ooo.oxo.mr.R;
 import ooo.oxo.mr.view.WindowInsetsHandler;
+import ooo.oxo.mr.view.WindowInsetsHelper;
 
-public class InsetsToolbar extends Toolbar implements WindowInsetsHandler {
+public class InsetsSwipeRefreshLayout extends SwipeRefreshLayout implements WindowInsetsHandler {
 
-    public InsetsToolbar(Context context) {
-        this(context, null);
+    public InsetsSwipeRefreshLayout(Context context) {
+        super(context);
     }
 
-    public InsetsToolbar(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, R.attr.toolbarStyle);
-    }
-
-    public InsetsToolbar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        ViewCompat.setOnApplyWindowInsetsListener(this, (v, insets) -> {
-            final int l = insets.getSystemWindowInsetLeft();
-            final int t = insets.getSystemWindowInsetTop();
-            final int r = insets.getSystemWindowInsetRight();
-            setPadding(l, t, r, 0);
-            return insets.consumeSystemWindowInsets();
-        });
+    public InsetsSwipeRefreshLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
 
     @Override
     public boolean onApplyWindowInsets(Rect insets) {
-        setPadding(insets.left, insets.top, insets.right, 0);
-        return true;
+        return WindowInsetsHelper.dispatchApplyWindowInsets(this, insets);
     }
 
 }

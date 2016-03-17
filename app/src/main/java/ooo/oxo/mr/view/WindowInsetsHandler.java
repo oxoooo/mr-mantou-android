@@ -16,26 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ooo.oxo.mr.widget;
+package ooo.oxo.mr.view;
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.util.TypedValue;
+import android.graphics.Rect;
 
-import ooo.oxo.mr.R;
+public interface WindowInsetsHandler {
 
-public class OhSwipeRefreshLayout extends InsetsSwipeRefreshLayout {
-
-    public OhSwipeRefreshLayout(Context context) {
-        this(context, null);
-    }
-
-    public OhSwipeRefreshLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-
-        TypedValue colorAccent = new TypedValue();
-        getContext().getTheme().resolveAttribute(R.attr.colorAccent, colorAccent, true);
-        setColorSchemeResources(colorAccent.resourceId);
-    }
+    boolean onApplyWindowInsets(Rect insets);
 
 }

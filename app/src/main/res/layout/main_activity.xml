@@ -26,7 +26,7 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <android.support.design.widget.AppBarLayout
+        <ooo.oxo.mr.widget.InsetsAppBarLayout
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
                 app:layout_scrollFlags="scroll|enterAlways|snap"
                 app:title="@string/app_name" />
 
-        </android.support.design.widget.AppBarLayout>
+        </ooo.oxo.mr.widget.InsetsAppBarLayout>
 
         <ooo.oxo.mr.widget.OhSwipeRefreshLayout
             android:id="@+id/refresher"
@@ -48,7 +48,7 @@
             android:layout_height="match_parent"
             app:layout_behavior="ooo.oxo.mr.widget.InsetsScrollingViewBehavior">
 
-            <ooo.oxo.mr.widget.OhRecyclerView
+            <ooo.oxo.mr.widget.InsetsRecyclerView
                 android:id="@+id/content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

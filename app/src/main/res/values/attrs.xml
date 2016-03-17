@@ -18,7 +18,7 @@
 
 <resources>
 
-    <declare-styleable name="OhRecyclerView">
+    <declare-styleable name="InsetsRecyclerView">
         <attr name="padding" format="dimension" />
     </declare-styleable>
 

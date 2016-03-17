@@ -20,30 +20,32 @@ package ooo.oxo.mr.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
 import ooo.oxo.mr.R;
+import ooo.oxo.mr.view.WindowInsetsHandler;
 
-public class OhRecyclerView extends RecyclerView {
+public class InsetsRecyclerView extends RecyclerView implements WindowInsetsHandler {
 
-    public OhRecyclerView(Context context) {
+    private final int padding;
+
+    public InsetsRecyclerView(Context context) {
         this(context, null);
     }
 
-    public OhRecyclerView(Context context, @Nullable AttributeSet attrs) {
+    public InsetsRecyclerView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public OhRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
+    public InsetsRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-        final int padding;
-
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.OhRecyclerView);
-        padding = a.getDimensionPixelOffset(R.styleable.OhRecyclerView_padding, 0);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.InsetsRecyclerView);
+        padding = a.getDimensionPixelOffset(R.styleable.InsetsRecyclerView_padding, 0);
         a.recycle();
 
         setPadding(padding, padding, padding, padding);
@@ -55,6 +57,15 @@ public class OhRecyclerView extends RecyclerView {
             setPadding(l, padding, r, b);
             return insets.consumeSystemWindowInsets();
         });
+    }
+
+    @Override
+    public boolean onApplyWindowInsets(Rect insets) {
+        final int l = padding + insets.left;
+        final int r = padding + insets.right;
+        final int b = padding + insets.bottom;
+        setPadding(l, padding, r, b);
+        return true;
     }
 
 }
