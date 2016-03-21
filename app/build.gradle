@@ -130,7 +130,7 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding-design:0.4.0'
     compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.4.0'
 
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.5.1@aar'
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.6.0@aar'
 
     compile 'com.github.oxoooo:pull-back-layout:1.0.1'
     compile 'com.github.oxoooo:touch-image-view:1.0.1'

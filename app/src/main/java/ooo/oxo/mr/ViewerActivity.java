@@ -113,8 +113,8 @@ public class ViewerActivity extends RxAppCompatActivity implements PullBackLayou
     }
 
     private Observable.Transformer<Void, Void> ensurePermissions(@NonNull String... permissions) {
-        return source -> RxPermissions.getInstance(ViewerActivity.this)
-                .request(source, permissions)
+        return source -> source
+                .compose(RxPermissions.getInstance(this).ensure(permissions))
                 .filter(granted -> {
                     if (granted) {
                         return true;
