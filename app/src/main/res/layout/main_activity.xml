@@ -27,7 +27,6 @@
         android:fitsSystemWindows="true">
 
         <ooo.oxo.mr.widget.InsetsAppBarLayout
-            android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:paddingTop="25dp">

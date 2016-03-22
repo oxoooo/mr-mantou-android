@@ -46,6 +46,7 @@ import ooo.oxo.mr.rx.RxAVQuery;
 import ooo.oxo.mr.rx.RxList;
 import ooo.oxo.mr.util.ToastUtil;
 import ooo.oxo.mr.util.UpdateUtil;
+import ooo.oxo.mr.view.MiuiStatusBarCompat;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -63,6 +64,8 @@ public class MainActivity extends RxAppCompatActivity implements MainAdapter.Lis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MiuiStatusBarCompat.enableLightStatusBar(getWindow());
 
         binding = DataBindingUtil.setContentView(this, R.layout.main_activity);
 
